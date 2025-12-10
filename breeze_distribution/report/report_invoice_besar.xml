@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <template id="new_report_invoice_besar">
+      <t t-call="web.html_container">
+        <t t-call="web.internal_layout">
+          <t t-foreach='docs' t-as="o">
+            <div class="page" style="font-size: 12px;"> 
+              <style>
+                .tab1 {
+                  display: inline-block;
+                  margin-left: 35px;
+                }
+                .tab2 {
+                  display: inline-block;
+                  margin-left: 18px;
+                }
+                .tab3 {
+                  display: inline-block;
+                  margin-left: 47px;
+                }
+                .tabs1 {
+                  display: inline-block;
+                  margin-left: 15px;
+                }
+                .tabs2 {
+                  display: inline-block;
+                  margin-left: 42px;
+                } 
+                .tabs3 {
+                  display: inline-block;
+                  margin-left: 51px;
+                }
+                .tabs4 {
+                  display: inline-block;
+                  margin-left: 23px;
+                }
+                .tabs5 {
+                  display: inline-block;
+                  margin-left: 7px;
+                }
+                .tabs6 {
+                  display: inline-block;
+                  margin-left: 5px;
+                }
+              </style>
+              <div name="company" class="row">
+                <div class="col-auto col-9">
+                  <img t-att-src="image_data_uri(o.company_id.logo)" style="width:100px;height:60px;"/>
+                </div>
+                <div class="col-auto">
+                <t><b><span t-esc="o.company_id.name"/></b></t><br/>
+                  <t><b><span t-esc="o.company_id.street"/></b></t>
+                  <t><b><span t-esc="o.company_id.street2"/></b></t>
+                  <t><b><t t-esc="o.company_id.city"/> <t t-esc="o.company_id.state_id.name"/> <t t-esc="o.company_id.zip"/></b></t>
+                  <t><b><t t-esc="o.company_id.country_id.name"/></b></t>
+                </div>
+                <div class="col-auto">
+                  <b>
+                  <t>Telp <span class="tabs4"/>: <t t-esc="o.company_id.phone"/></t><br/>
+                  <t>Email <span class="tabs1"/>: <t t-esc="o.company_id.email"/></t><br/>
+                  <t>NPWP <span class="tabs5"/>: <t t-esc="o.company_id.vat"/></t>
+                  </b>
+                </div>
+              </div>
+              <div name="header" class="row">
+                <div class="col-auto">
+                </div>
+                <div class="col-auto text-center">
+                  <h2 style="font-size: 16px;">INVOICE</h2>
+                  <br/>
+                </div>
+                <div class="col-auto">
+                </div>
+              </div>
+              <div name="data_pelanggan" class="row">
+                <div class="col-auto border border-dark">
+                  <table>
+                    <tr>
+                    <td>NAMA</td>
+                    <td>
+                      <span class="tabs6"/>: <t t-esc="o.partner_id.name"/>
+                    </td>
+                    </tr>
+                    <tr>
+                      <td>ALAMAT</td>
+                      <td>
+                        <span class="tabs6"/>: <t t-esc="o.partner_id.street"/>. <t t-esc="o.partner_id.city" class="tab2"/>. <t t-esc="o.partner_id.state_id.name"/>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>TELP</td>
+                      <td>
+                        <span class="tabs6"/>: <t t-esc="o.partner_id.phone"/>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>EMAIL</td>
+                      <td>
+                        <span class="tabs6"/>: <t t-esc="o.partner_id.email"/>
+                      </td>
+                    </tr>
+                  </table>
+              </div>
+              <div class="col-auto border border-dark ml-2">
+                <t>INVOICE DATE <span class="tabs2"/>:
+                  <t t-esc="o.invoice_date.strftime('%d/%m/%Y ')"/>
+                </t><br/>
+                <t>INVOICE NUMBER <span class="tabs1"/>:
+                  <t t-esc="o.name"/>
+                </t><br/>
+                <t t-if="o.code_inventory()">
+                  <t>NO DELIVERY SLIP <span class="tabs1"/>:
+                  <t t-esc="o.code_inventory()"/>
+                  </t><br/>
+                </t>
+                <t t-else="">
+                  <t>NO DELIVERY SLIP <span class="tabs1"/>: -</t><br/>
+                </t>
+                <t>JATUH TEMPO  <span class="tabs2"/>:
+                  <t t-esc="o.invoice_date_due.strftime('%d/%m/%Y ')"/>
+                </t><br/>
+                <t>TAX NUMBER <span class="tabs3"/>: <t t-esc="o.l10n_id_tax_number"/>
+                </t>
+              </div>
+            </div>
+            <div name="tabel" class="row">
+              <table class="table table-sm table-bordered">
+                <thead class="table-primary">
+                  <tr>
+                    <th name="th_no" class="text-center" scope="col">No</th>
+                    <th name="th_nama_barang" class="text-center" scope="col">Product Description</th>
+                    <th name="th_expired_date" class="text-center" scope="col">Expired Date</th>
+                    <th name="th_qty" class="text-center" scope="col">QTY</th>
+                    <th name="th_item_unit" class="text-center" scope="col">Item Unit</th>
+                    <th name="th_unit_price" class="text-center" scope="col">Unit Price</th>
+                    <th name="th_discount" class="text-center" scope="col">Disc(%)</th>
+                    <th name="th_total" class="text-center" scope="col">Total Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <t t-set="total_diskon" t-value="0"/>
+                  <t t-foreach="o.invoice_line_ids" t-as="line">
+                    <tr>
+                      <td style = "text-align: right">
+                        <span t-esc="line_index + 1"/>
+                      </td>
+                      <td>
+                        <span t-esc="line.product_id.name"/>
+                      </td>
+                      <td>
+                        <span t-esc="line.product_id.kadaluarsa" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                      </td>
+                      <td style = "text-align: right">
+                        <span t-esc="'%.0f'% line.quantity"/>
+                      </td>
+                      <td>
+                        <span t-esc="line.product_uom_id.name"/>
+                      </td>
+                      <td style = "text-align: right">
+                        <span t-esc="line.price_unit" t-options='{"widget": "monetary", "display_currency": line.currency_id}'/>
+                      </td>
+                      <td style = "text-align: right">
+                        <span t-esc="line.discount"/>
+                      </td>
+                      <td style = "text-align: right">
+                        <span t-esc="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": line.currency_id}'/>
+                      </td>
+                    </tr>
+                    <t t-set="total_diskon" t-value="total_diskon + (line.price_subtotal* line.discount/100)"/>
+                  </t>
+                </tbody>
+              </table>
+            </div>
+            <div name="total" class="row">
+              <div class="col-auto row">
+                <table class="table table-bordered">
+                  <tr>
+                    <th>
+                      <t>Catatan</t><br/>
+                      <t>*Batas complain dan retur maksimal 1 minggu setelah pengiriman barang</t>
+                    </th>
+                  </tr>
+                  <tr>
+                    <td>Terbilang <t t-esc="o.bilangan()"/> rupiah
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <div class="col-auto row">
+                <table class="table table-bordered">
+                  <tr>
+                    <th>Sub Total(Rp)</th>
+                    <td class="text-right">
+                      <t t-esc="'{:,.0f}'.format(o.amount_untaxed)"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>PPN(11%)(Rp)</th>
+                    <td class="text-right">
+                      <t t-esc="'{:,.0f}'.format(o.amount_tax)"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Total Invoice(Rp)</th>
+                    <td class="text-right">
+                      <t t-esc="'{:,.0f}'.format(o.amount_total)"/>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div name="pembayaran" class="row">
+              <table class="table table-bordered">
+                <tr>
+                  <th>
+                    <div class="row">
+                      <div class="col-auto">
+                        <p>
+                        Pembayaran ditransfer ke: <br/>
+                        <t t-esc="o.company_id.nama_bank"/> <br/>
+                        No. Rek : <t t-esc="o.company_id.rek_bank"/> <br/>
+                        A/n <t t-esc="o.company_id.atas_nama"/>
+                        </p>
+                      </div>
+                      <div class="col-auto">
+                        <p>
+                          <br/>
+                          <t t-esc="o.company_id.nama_bank2"/> <br/>
+                          No. Rek : <t t-esc="o.company_id.rek_bank2"/> <br/>
+                          A/n <t t-esc="o.company_id.atas_nama2"/>
+                        </p>
+                      </div>
+                    </div>
+                </th>
+              </tr>
+            </table>
+          </div>
+        <div name="footer" class="row" style="font-size: 12px;"> 
+          <div class="col-auto text-center">
+              <br/>
+              <p>Penerima</p>
+              <br/>
+              <br/>
+              <br/>
+              <br/>
+              <hr style="height:1px;border-width:0; color:black; background-color:black;"/>
+            </div>
+            <div class="col-auto text-center">
+              <br/>
+              <p>Gudang</p>
+              <br/>
+              <br/>
+              <br/>
+              <br/>
+              <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+            </div>
+            <div class="col-auto text-center">
+              <br/>
+              <p>Penanggung Jawab</p>
+              <br/>
+              <br/>
+              <br/>
+              <br/>
+              <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+            </div>
+            <div class="col-auto text-center">
+              <br/>
+              <p>Hormat Kami</p>
+              <br/>
+              <br/>
+              <br/>
+              <br/>
+              <hr style="height:1px; border-width:0; color:black; background-color:black;"/>
+            </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="text-right">
+          <t><i style="font-size: 10px;">Printed On : <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/></i>
+          </t>
+        </div>
+      </div>
+    </t>
+  </t>
+</t>
+
+</template>
+
+</data>
+
+
+</odoo>

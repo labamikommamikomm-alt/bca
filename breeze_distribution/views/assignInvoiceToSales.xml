@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="assign_tree" model="ir.ui.view">
+        <field name="name">breeze_distribution assign</field>
+        <field name="model">breeze_distribution.assign</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sales_id" />
+                <field name="tanggal" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="assign_form" model="ir.ui.view">
+        <field name="name">assign.form</field>
+        <field name="model">breeze_distribution.assign</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                    <group>
+                        <field name="sales_id" />
+                        <field name="invoice_id" domain="['|',('payment_state', '=', 'not_paid'), ('payment_state', '=', 'partial')]" />
+                        <field name="tanggal" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="breeze_distribution_assign_action" model="ir.actions.act_window">
+        <field name="name">Assign Invoice to Sales</field>
+        <field name="res_model">breeze_distribution.assign</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem id="assign_menu" name="Assign Invoice ke Sales" action="breeze_distribution_assign_action" parent="sale.sale_menu_root" sequence="10" />
+</odoo>

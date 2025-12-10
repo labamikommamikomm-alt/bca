@@ -1,0 +1,12 @@
+<odoo>
+    <record id="uom_form_view_coretax" model="ir.ui.view">
+        <field name="name">uom.uom.form.coretax</field>
+        <field name="model">uom.uom</field>
+        <field name="inherit_id" ref="uom.product_uom_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='rounding']" position="after">
+                 <field name="kode_satuan"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

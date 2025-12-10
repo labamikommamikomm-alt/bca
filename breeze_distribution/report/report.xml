@@ -1,0 +1,191 @@
+<odoo>
+
+    <record id="report_invoice" model="ir.actions.report">
+        <field name="name">Assign Invoice to Sales</field>
+        <field name="model">breeze_distribution.assign</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_cetakdaftarinvoice</field>
+        <field name="report_file">breeze_distribution.report_cetakdaftarinvoice</field>
+        <field name="binding_model_id" ref="model_breeze_distribution_assign" />
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="report_batchinvoice31" model="ir.actions.report">
+        <field name="name">Assign Invoice to Sales batch</field>
+        <field name="model">breeze_distribution.assign</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_batchInvoice</field>
+        <field name="report_file">breeze_distribution.report_batchInvoice</field>
+        <field name="binding_model_id" ref="model_breeze_distribution_assign" />
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="report_faktur_action" model="ir.actions.report">
+        <field name="name">Report Faktur</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_faktur</field>
+        <field name="report_file">breeze_distribution.report_faktur</field>
+        <field name="binding_model_id" ref="account.model_account_move" />
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="report_new_invoice" model="ir.actions.report">
+        <field name="name">Invoice ATMU A5</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.new_report_invoice</field>
+        <field name="report_file">breeze_distribution.new_report_invoice</field>
+        <field name="paperformat_id" ref="breeze_distribution.invoice_a5" />
+        <field name="binding_model_id" ref="account.model_account_move" />
+        <field name="binding_type">report</field>
+    </record>
+    
+    <record id="report_new_delivery_slip" model="ir.actions.report">
+        <field name="name">Surat Jalan ATMU A5</field>
+        <field name="model">stock.picking</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.new_report_delivery_slip</field>
+        <field name="report_file">breeze_distribution.new_report_delivery_slip</field>
+        <field name="paperformat_id" ref="breeze_distribution.invoice_a5" />
+        <field name="binding_model_id" ref="stock.model_stock_picking" />
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- <record id="report_batch_invoice_piutang_action" model="ir.actions.report">
+        <field name="name">Laporan Piutang</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_batch_invoice_piutang</field>
+        <field name="report_file">breeze_distribution.report_batch_invoice_piutang</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record> -->
+
+    <record id="report_new_invoice_besar" model="ir.actions.report">
+        <field name="name">Invoice ATMU A4</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.new_report_invoice_besar</field>
+        <field name="report_file">breeze_distribution.new_report_invoice_besar</field>
+        <field name="paperformat_id" ref="breeze_distribution.invoice_a4" />
+        <field name="binding_model_id" ref="account.model_account_move" />
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- <record id="report_new_invoice_hutang_pembelian" model="ir.actions.report">
+        <field name="name">Rekap Hutang Pembelian</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_hutang_pembelian</field>
+        <field name="report_file">breeze_distribution.report_hutang_pembelian</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record> -->
+
+    <record id="report_rekap_pembayaran_hutang_action" model="ir.actions.report">
+        <field name="name">Rekap Pembayaran Hutang</field>
+        <field name="model">report.rekap_pembayaran_hutang</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_rekap_pembayaran_hutang</field>
+        <field name="report_file">breeze_distribution.report_rekap_pembayaran_hutang</field>
+    </record>
+
+    <record id="report_new_invoice_bukti_pembayaran" model="ir.actions.report">
+        <field name="name">Bukti Pembayaran(Vendor)</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_bukti_pembayaran</field>
+        <field name="report_file">breeze_distribution.report_bukti_pembayaran</field>
+        <field name="binding_model_id" ref="account.model_account_move" />
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="report_new_invoice_rekap_pembayaran" model="ir.actions.report">
+        <field name="name">Rekap Pembayaran</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_rekap_pembayaran</field>
+        <field name="report_file">breeze_distribution.report_rekap_pembayaran</field>
+        <field name="binding_model_id" ref="account.model_account_move" />
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- <record id="report_new_invoice_rekap_piutang_perkolektor" model="ir.actions.report">
+        <field name="name">Rekap Piutang(perkolektor)</field>
+        <field name="model">crm.team</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_rekap_piutang_perkolektor</field>
+        <field name="report_file">breeze_distribution.report_rekap_piutang_perkolektor</field>
+        <field name="binding_model_id" ref="sales_team.model_crm_team"/>
+        <field name="binding_type">report</field>
+    </record> -->
+
+    <record id="report_rekap_piutang_action" model="ir.actions.report">
+        <field name="name">Laporan Rekap Piutang</field>
+        <field name="model">report.rekap_piutang</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_rekap_piutang</field>
+        <field name="report_file">breeze_distribution.report_rekap_piutang</field>
+    </record>
+
+    <record id="report_rekap_penjualan_action" model="ir.actions.report">
+        <field name="name">Laporan Rekap Penjualan</field>
+        <field name="model">report.rekap_penjualan</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_rekap_penjualan</field>
+        <field name="report_file">breeze_distribution.report_rekap_penjualan</field>
+    </record>
+
+    <record id="report_rekap_pembelian_action" model="ir.actions.report">
+        <field name="name">Laporan Rekap Pembelian</field>
+        <field name="model">report.rekap_pembelian</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_rekap_pembelian</field>
+        <field name="report_file">breeze_distribution.report_rekap_pembelian</field>
+    </record>
+
+    <record id="report_rekap_pembayaran_piutang_action" model="ir.actions.report">
+        <field name="name">Laporan Rekap Pembayaran Piutang</field>
+        <field name="model">report.rekap_pembayaran_piutang</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_rekap_pembayaran_piutang</field>
+        <field name="report_file">breeze_distribution.report_rekap_pembayaran_piutang</field>
+    </record>
+
+    <record id="report_rekap_hutang_action" model="ir.actions.report">
+        <field name="name">Laporan Rekap Hutang</field>
+        <field name="model">report.rekap_hutang</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_rekap_hutang</field>
+        <field name="report_file">breeze_distribution.report_rekap_hutang</field>
+    </record>
+
+    <record id="report_return_penjualan" model="ir.actions.report">
+        <field name="name">Retur Penjualan</field>
+        <field name="model">stock.picking</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_return_deliveryslip</field>
+        <field name="report_file">breeze_distribution.report_return_deliveryslip</field>
+        <field name="print_report_name">'Retur Penjualan - %s - %s' % (object.partner_id.name or '',
+            object.name)</field>
+        <field name="binding_model_id" ref="model_stock_picking" />
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="report_rekap_piutang_perkolektor_action" model="ir.actions.report">
+        <field name="name">Laporan Rekap Piutang Perkolektor</field>
+        <field name="model">report.rekap_piutang_perkolektor</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_rekap_piutang_perkolektor</field>
+        <field name="report_file">breeze_distribution.report_rekap_piutang_perkolektor</field>
+    </record>
+
+    <record id="report_rekap_hasil_tagihan_action" model="ir.actions.report">
+        <field name="name">Laporan Rekap Hasil Tagihan</field>
+        <field name="model">report.rekap_hasil_tagihan</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_rekap_hasil_tagihan</field>
+        <field name="report_file">breeze_distribution.report_rekap_hasil_tagihan</field>
+    </record>
+</odoo>

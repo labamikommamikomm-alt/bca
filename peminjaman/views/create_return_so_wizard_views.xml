@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="create_return_so_wizard_form_view" model="ir.ui.view">
+        <field name="name">create.return.so.wizard.form</field>
+        <field name="model">create.return.so.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Buat Pengembalian Barang">
+                <group>
+                    <group>
+                        <field name="partner_id"/>
+                    </group>
+                    <group>
+                        <field name="date_order"/>
+                    </group>
+                </group>
+                <notebook>
+                    <page string="Produk yang Dikembalikan">
+                        <field name="return_line_ids" mode="tree">
+                            <tree string="Produk Pengembalian" editable="bottom">
+                                <control>
+                                    <create string="Tambah Produk"/>
+                                </control>
+                                <field name="product_id"
+                                    domain="[('sale_ok', '=', True)]"
+                                    force_save="1"
+                                    options="{'no_open': True, 'no_create': True}"/>
+                                <field name="quantity"/>
+                                <field name="uom_id" groups="uom.group_uom"/>
+                                <field name="name" invisible="1"/> </tree>
+                        </field>
+                    </page>
+                </notebook>
+                <footer>
+                    <button name="action_create_return_so" string="Buat Sales Order Pengembalian" type="object" class="btn-primary"/>
+                    <button string="Batal" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_create_return_so_wizard" model="ir.actions.act_window">
+        <field name="name">Pengembalian Barang (SO)</field>
+        <field name="res_model">create.return.so.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+
+    <menuitem id="menu_create_return_so"
+        name="Buat Pengembalian (SO)"
+        parent="menu_main_peminjaman"
+        action="action_create_return_so_wizard"
+        sequence="10"/>
+
+</odoo>

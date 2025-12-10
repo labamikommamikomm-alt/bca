@@ -1,0 +1,215 @@
+<odoo>
+    <template id="new_report_delivery_slip">
+        <t t-call="web.html_container">
+            <t t-set="data_report_margin_top" t-value="10" />
+            <t t-set="data_report_header_spacing" t-value="50" />
+            <t t-set="data_report_dpi" t-value="110" />
+            <t t-call="web.internal_layout">
+                <t t-foreach='docs' t-as="o">
+                    <div class="page" style="font-family: Arial, sans-serif">
+                        <div name="company" class="row">
+                            <div class="col-auto col-9">
+                                <img t-att-src="image_data_uri(o.company_id.logo)"
+                                    style="width:100px;height:60px;" />
+                            </div>
+                            <div class="col-auto">
+                                <t>
+                                    <b>
+                                        <span t-esc="o.company_id.name" />
+                                    </b>
+                                </t>
+                                <br />
+                                <t>
+                                    <b>
+                                        <span t-esc="o.company_id.street" />
+                                    </b>
+                                </t>
+                                <t>
+                                    <b>
+                                        <span t-esc="o.company_id.street2" />
+                                    </b>
+                                </t>
+                                <t>
+                                    <b>
+                                        <t t-esc="o.company_id.city" />
+                                        <t t-esc="o.company_id.state_id.name" />
+                                        <t t-esc="o.company_id.zip" />
+                                    </b>
+                                </t>
+                                <t>
+                                    <b>
+                                        <t t-esc="o.company_id.country_id.name" />
+                                    </b>
+                                </t>
+                            </div>
+                            <div class="col-auto">
+                                <b>
+                                    <t>Telp : <t t-esc="o.company_id.phone" />
+                                    </t>
+                                    <br />
+                                    <t>Email : <t t-esc="o.company_id.email" />
+                                    </t>
+                                    <br />
+                                    <t>NPWP : <t t-esc="o.company_id.vat" />
+                                    </t>
+                                </b>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1cm font-family: Courier, monospace;">
+
+                            <br />
+                            <h4 class="text-center">Surat Jalan</h4>
+                        </div>
+
+                        <div name="header" class="row">
+                            <div class="col-auto">
+                                <!-- Menggunakan struktur row/col mini untuk penjajaran (alignment) -->
+                                
+                                <div class="row" style="margin-left: 0px; margin-right: 0px;">
+                                    <div class="col-4" style="padding: 0px;">
+                                        <t>No. Surat</t>
+                                    </div>
+                                    <div class="col-8" style="padding: 0px;">
+                                        : <span t-field="o.name" />
+                                    </div>
+                                </div>
+                                <div class="row" style="margin-left: 0px; margin-right: 0px;">
+                                    <div class="col-4" style="padding: 0px;">
+                                        <t>Salesman</t>
+                                    </div>
+                                    <div class="col-8" style="padding: 0px;">
+                                        : <span t-field="o.sale_id.team_id.name" />
+                                    </div>
+                                </div>
+                                
+                                <t t-set="sale_names" t-value="o.sudo().sale_id.name" />
+                                <t t-if="not sale_names and o.origin">
+                                    <t t-set="origin_names" t-value="o.sudo().origin.split(', ')" />
+                                </t>
+                                
+                                <t t-if="sale_names or origin_names">
+                                    <div class="row" style="margin-left: 0px; margin-right: 0px;">
+                                        <div class="col-4" style="padding: 0px;">
+                                            <t>Order</t>
+                                        </div>
+                                        <div class="col-8" style="padding: 0px;">
+                                            : <span t-esc="sale_names or origin_names" />
+                                        </div>
+                                    </div>
+                                </t>
+                                
+                            </div>
+                            <div class="col-auto text-center">
+                                <t>Tanggal: <span t-field="o.scheduled_date"
+                                        t-options='{"widget": "date", "format": "dd/MM/yyyy"}' /></t>
+                            </div>
+                            <div class="col-auto">
+
+                                <t t-if="o.partner_id">
+                                    <strong>Kepada Yth.</strong>
+                                    <br />
+                                    <div t-esc="o.partner_id"
+                                        t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True}' />
+                                </t>
+                            </div>
+                        </div>
+
+                        <div name="tabel" class="row mt-3">
+                            <table class="table table-sm table-bordered">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th name="th_no" class="text-center" scope="col">No</th>
+                                        <th name="th_nama_barang" class="text-center" scope="col">Nama
+                                            Barang</th>
+
+                                        <th name="th_qty" class="text-center" scope="col">Qty</th>
+                                        <th name="th_satuan" class="text-center" scope="col">Satuan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="number" t-value="1" />
+                                    <t t-foreach="o.move_line_ids_without_package" t-as="move_line">
+                                        <tr>
+                                            <td style="padding: 0.5px; text-align: center">
+                                                <span t-esc="number" />
+                                            </td>
+                                            <td style="padding: 0.5px;">
+                                                <span t-field="move_line.product_id.display_name" />
+                                                <t t-if="move_line.product_id.description_picking">
+                                                    <br />
+                                                    <span
+                                                        t-field="move_line.product_id.description_picking" />
+                                                </t>
+                                            </td>
+
+                                            <td style="padding: 0.5px; text-align: center">
+                                                <span t-field="move_line.qty_done"
+                                                    t-options='{"widget": "float", "precision": 0}' />
+                                            </td>
+                                            <td style="padding: 0.5px; text-align: center">
+                                                <span t-field="move_line.product_uom_id.name" />
+                                            </td>
+                                        </tr>
+                                        <t t-set="number" t-value="number+1" />
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div name="catatan_dan_sales" class="row mt-3">
+                            <div class="col-6">
+                                <div t-if="o.note" name="catatan" class="border border-dark p-2">
+                                    <strong>Note:</strong>
+                                    <p>
+                                        <t t-esc="o.note" />
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-6 text-right">
+
+                            </div>
+                        </div>
+
+                        <div name="footer_signatures" class="row mt-5">
+                            <div class="col-auto text-center">
+                                <p>Penerima</p>
+                                <br />
+                                <br />
+                                <hr
+                                    style="height:1px;border-width:0; color:black; background-color:black;" />
+                            </div>
+                            <div class="col-auto text-center">
+                                <p>Gudang</p>
+                                <br />
+                                <br />
+                                <hr
+                                    style="height:1px;border-width:0; color:black; background-color:black;" />
+                            </div>
+                            <div class="col-auto text-center">
+                                <p>Penanggung Jawab Teknis</p>
+                                <br />
+                                <br />
+                                <hr
+                                    style="height:1px;border-width:0; color:black; background-color:black;" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="footer" style="font-size: 10px;">
+                        <div class="row">
+                            <div class="col-6 text-left">
+                                <!-- Batas complain atau informasi lain jika diperlukan -->
+                            </div>
+                            <div class="col-6 text-right">
+                                <t>
+                                    <i>Printed On : <t
+                                            t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')" /></i>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="global_tax_view_tree" model="ir.ui.view">
+        <field name="name">global_tax.view.tree</field>
+        <field name="model">breeze_distribution.global_tax</field>
+        <field name="arch" type="xml">
+            <tree string="">
+                <field name="name" />
+                <field name="state" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="global_tax_view_form" model="ir.ui.view">
+        <field name="name">global_tax.view.form</field>
+        <field name="model">breeze_distribution.global_tax</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                    <group>
+                        <field name="name" />
+                        <field name="jumlah" />
+                        <field name="akun" />
+                        <field name="active" />
+                        <field name="berlaku_jika"/>
+                        <field name="kondisi" attrs="{'invisible': [('berlaku_jika', '=', False)]}" />
+                        <field name="nilai" attrs="{'invisible': [('berlaku_jika', '=', False)]}"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="global_tax_action" model="ir.actions.act_window">
+        <field name="name">Global Taxes</field>
+        <field name="res_model">breeze_distribution.global_tax</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_profit_loss">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <div class="text-center">
+                        <h3 t-esc="company.name"/>
+                        <h4>LAPORAN LABA RUGI</h4>
+                        <p t-if="num_periods == 1">Per <span t-esc="column_headers[0]"/></p>
+                    </div>
+
+                    <table class="table table-sm table-borderless mt-4">
+                        <thead class="border-bottom">
+                            <tr>
+                                <th style="width: 50%;">Keterangan</th>
+                                <th t-foreach="column_headers" t-as="header" class="text-right" style="width: 15%;">
+                                    <t t-esc="header"/>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td t-att-colspan="1 + num_periods"><strong>I. PEREDARAN USAHA</strong></td></tr>
+                            <tr class="border-top">
+                                <td style="padding-left:20px;"><strong>PENJUALAN BERSIH</strong></td>
+                                <td t-foreach="data['penjualan']['balances']" t-as="val" class="text-right font-weight-bold">
+                                     <span t-esc="val" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
+                                </td>
+                            </tr>
+
+                            <tr><td t-att-colspan="1 + num_periods" class="pt-4"><strong>II. HARGA POKOK PENJUALAN</strong></td></tr>
+                            <tr class="border-top">
+                                <td style="padding-left:20px;"><strong>HARGA POKOK PENJUALAN</strong></td>
+                                <td t-foreach="data['hpp']['balances']" t-as="hpp" class="text-right font-weight-bold">
+                                     (<span t-esc="hpp" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>)
+                                </td>
+                            </tr>
+
+                            <tr class="border-top border-bottom">
+                                <td><strong>III. LABA KOTOR</strong></td>
+                                <td t-foreach="range(num_periods)" t-as="i" class="text-right font-weight-bold">
+                                     <t t-set="laba_kotor" t-value="data['penjualan']['balances'][i] - data['hpp']['balances'][i]"/>
+                                     <span t-esc="laba_kotor" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
+                                </td>
+                            </tr>
+
+                            <tr><td t-att-colspan="1 + num_periods" class="pt-4"><strong>IV. BIAYA-BIAYA (BEBAN USAHA)</strong></td></tr>
+                            <tr t-foreach="expense_details" t-as="line">
+                                <td style="padding-left:20px;">
+                                    <span t-esc="line['code']"/> - <span t-esc="line['name']"/>
+                                </td>
+                                <td t-foreach="line['balances']" t-as="val" class="text-right">
+                                    <span t-esc="val" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
+                                </td>
+                            </tr>
+                            <tr class="border-top">
+                                <td style="padding-left:20px;"><strong>TOTAL BIAYA USAHA</strong></td>
+                                <td t-foreach="range(num_periods)" t-as="i" class="text-right font-weight-bold">
+                                    <t t-set="total_biaya" t-value="sum(line['balances'][i] for line in expense_details)"/>
+                                     (<span t-esc="total_biaya" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>)
+                                </td>
+                            </tr>
+
+                             <t t-set="laba_sebelum_pajak" t-value="[0.0] * num_periods"/>
+                             <tr><td t-att-colspan="1 + num_periods" class="pt-4"><strong>V. PENGHASILAN &amp; BIAYA LAIN-LAIN</strong></td></tr>
+                             <tr>
+                                 <td style="padding-left:20px;">PENGHASILAN LAIN-LAIN</td>
+                                 <td t-foreach="data['pendapatan_lain']['balances']" t-as="val" class="text-right">
+                                     <span t-esc="val" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
+                                 </td>
+                             </tr>
+                             <tr>
+                                 <td style="padding-left:20px;">BIAYA LAIN-LAIN</td>
+                                 <td t-foreach="data['biaya_lain']['balances']" t-as="val" class="text-right">
+                                     (<span t-esc="val" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>)
+                                 </td>
+                             </tr>
+                             <tr class="border-top">
+                                <td style="padding-left:20px;"><strong>TOTAL PENGHASILAN &amp; BIAYA LAIN-LAIN</strong></td>
+                                <td t-foreach="range(num_periods)" t-as="i" class="text-right font-weight-bold">
+                                     <t t-set="total" t-value="data['pendapatan_lain']['balances'][i] - data['biaya_lain']['balances'][i]"/>
+                                     <span t-esc="total" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
+                                </td>
+                            </tr>
+
+                             <tr class="border-top border-bottom">
+                                 <td><strong>VI. LABA BERSIH SEBELUM PAJAK</strong></td>
+                                 <td t-foreach="range(num_periods)" t-as="i" class="text-right font-weight-bold">
+                                     <t t-set="laba_kotor" t-value="data['penjualan']['balances'][i] - data['hpp']['balances'][i]"/>
+                                     <t t-set="total_biaya" t-value="sum(line['balances'][i] for line in expense_details)"/>
+                                     <t t-set="total_lain" t-value="data['pendapatan_lain']['balances'][i] - data['biaya_lain']['balances'][i]"/>
+                                     <t t-set="laba_bersih_val" t-value="laba_kotor - total_biaya + total_lain"/>
+                                     <t t-set="laba_sebelum_pajak[i]" t-value="laba_bersih_val"/>
+                                     <span t-esc="laba_bersih_val" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
+                                 </td>
+                             </tr>
+                             <tr>
+                                 <td style="padding-left:20px;">PAJAK PENGHASILAN</td>
+                                 <td t-foreach="data['pajak']['balances']" t-as="val" class="text-right">
+                                     (<span t-esc="val" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>)
+                                 </td>
+                             </tr>
+                             <tr class="border-top" style="background-color:#f2f2f2;">
+                                 <td><strong>LABA BERSIH SETELAH PAJAK</strong></td>
+                                 <td t-foreach="range(num_periods)" t-as="i" class="text-right font-weight-bold">
+                                     <t t-set="final" t-value="laba_sebelum_pajak[i] - data['pajak']['balances'][i]"/>
+                                     <span t-esc="final" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
+                                 </td>
+                             </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

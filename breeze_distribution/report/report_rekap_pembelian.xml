@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <template id="report_rekap_pembelian">
+    <t t-call="web.html_container">
+      <t t-set="data_report_margin_top" t-value="5"/>
+      <t t-set="data_report_header_spacing" t-value="50"/>
+      <t t-set="data_report_dpi" t-value="110"/>
+      <t t-call="web.internal_layout">
+        <div class="page">
+          <div class="text-center">
+            <h3><span t-esc="company_name"/></h3>
+          </div>
+          <div class="text-center">
+            <h2>LAPORAN DATA PEMBELIAN</h2>
+            <p>Periode: <span t-esc="start_date_formatted"/> - <span t-esc="end_date_formatted"/></p>
+          </div>
+          <div name="tanggal">
+            <span t-esc="current_datetime"/>
+          </div>
+          <div name="tabel" class="row">
+            <table class="table table-sm table-bordered">
+              <thead class="table-primary">
+                <tr>
+                  <th name="th_no_dok" scope="col">No Dok</th>
+                  <th name="th_tgl_faktur" scope="col">Tgl Faktur</th>
+                  <th name="th_supplier" scope="col">Supplier</th>
+                  <th name="th_faktur" scope="col">Faktur</th>
+                  <th name="th_nama_barang" scope="col">Nama Barang</th>
+                  <th name="th_qty" scope="col">Qty</th>
+                  <th name="th_sat" scope="col">Satuan</th>
+                  <th name="th_harga" scope="col">Harga</th>
+                  <th name="th_jumlah" scope="col">Jumlah</th>
+                  <th name="th_sub_total" scope="col">Sub Total</th>
+                  <th name="th_ppn" scope="col">PPN</th>
+                  <th name="th_total" scope="col">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <t t-foreach="lines" t-as="line">
+                  <t t-foreach="line['product']" t-as="products">
+                    <tr>
+                      <td>
+                       <span t-esc="line['no_dok']"/>
+                      </td>
+                      <td>
+                        <span t-esc="line['tgl_faktur'].strftime('%d/%m/%Y ')"/>
+                      </td>
+                      <td>
+                        <span t-esc="line['supplier']"/>
+                      </td>
+                      <td>
+                        <span t-esc="line['faktur']"/>
+                      </td>
+                      <td>
+                        <span t-esc="products['nama_barang']"/>
+                      </td>
+                      <td class="text-right">
+                        <span t-esc="products['qty']" t-options='{"widget": "float", "precision": 0}'/>
+                      </td>
+                      <td>
+                        <span t-esc="products['sat']"/>
+                      </td>
+                      <td class="text-right">
+                        <span t-esc="products['harga']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                      </td>
+                      <td class="text-right">
+                        <span t-esc="products['jumlah']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                      </td>
+                      <!-- Kolom ini sengaja dikosongkan karena nilainya ada di baris total -->
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  </t>
+                  <!-- BARIS TOTAL PER FAKTUR INI HANYA AKAN MUNCUL JIKA OPSI DICENTANG -->
+                  <t t-if="data['show_invoice_total']">
+                      <tr class="table-info">
+                        <!-- Mengubah colspan menjadi 9 agar pas dengan kolom yang tersisa -->
+                        <td colspan="9" class="text-end"><strong>Total per Faktur:</strong></td>
+                        <!-- Menampilkan hanya Sub Total, PPN, dan Total -->
+                        <td class="text-right"><strong t-esc="line['sub_total']" t-options='{"widget": "monetary", "display_currency": currency_id}'/></td>
+                        <td class="text-right"><strong t-esc="line['ppn']" t-options='{"widget": "monetary", "display_currency": currency_id}'/></td>
+                        <td class="text-right"><strong t-esc="line['total']" t-options='{"widget": "monetary", "display_currency": currency_id}'/></td>
+                      </tr>
+                      <tr class="bg-white"> <td colspan="12" style="border: none; height: 10px;"></td>
+                      </tr>
+                  </t>
+                </t>
+              </tbody>
+              <tfoot>
+                <tr class="bg-secondary text-white">
+                    <!-- Mengubah colspan menjadi 9 agar pas dengan kolom yang tersisa -->
+                    <td colspan="9" class="text-end"><strong>TOTAL:</strong></td>
+                    <!-- Menampilkan hanya Grand Sub Total, Grand PPN, dan Grand Total -->
+                    <td class="text-right"><strong t-esc="grand_sub_total" t-options='{"widget": "monetary", "display_currency": currency_id}'/></td>
+                    <td class="text-right"><strong t-esc="grand_ppn" t-options='{"widget": "monetary", "display_currency": currency_id}'/></td>
+                    <td class="text-right"><strong t-esc="grand_total_amount" t-options='{"widget": "monetary", "display_currency": currency_id}'/></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </t>
+    </t>
+
+  </template>
+
+</odoo>

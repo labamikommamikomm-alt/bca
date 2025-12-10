@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <template id="report_batch_invoice_piutang">
+    <t t-call="web.html_container">
+      <t t-call="web.external_layout">
+        <div class="page">
+          <div class="text-center">
+            <h2>LAPORAN REKAP PIUTANG</h2>
+          </div>
+          <div name="header" class="row">
+            <!-- <t t-foreach='docs' t-as="o"> -->
+              <div class="col-auto">
+                <p>Tanggal : <span t-esc="docs[-1].invoice_date.strftime('%d/%m/%Y ')"/> sd 
+                <span t-esc="docs[0].invoice_date.strftime('%d/%m/%Y ')"/> 
+                </p>
+              </div>
+              <div class="col-auto">
+              </div>
+              <div class="col-auto">
+                <p>
+                  <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y ')"/>
+                </p>
+              </div>
+            <!-- </t> -->
+          </div>
+          <div name="tabel" class="row">
+            <table class="table table-sm table-bordered">
+              <thead class="table-primary">
+                <tr>
+                  <th name="th_no" scope="col">No</th>
+                  <th name="th_tanggal_jual" scope="col">Tanggal Faktur</th>
+                  <th name="th_nota_penjualan" scope="col">No Faktur</th>
+                  <th name="th_customer" scope="col">Customer</th>
+                  <th name="th_piutang" scope="col">Jumlah</th>
+                  <th name="th_terbayar" scope="col">Terbayar</th>
+                  <th name="th_sisa_piutang" scope="col">Sisa</th>
+                  <th name="th_kota" scope="col">Wilayah</th>
+                  <th name="th_sales" scope="col">Sales</th>
+                </tr>
+              </thead>
+              <tbody>
+                <t t-set="no" t-value="1"/>
+                <t t-set="jumlah_terbayar" t-value="0"/>
+                <t t-foreach='docs' t-as="o">
+                  <tr>
+                    <td>
+                      <span t-esc="no"/>
+                    </td>
+                    <td>
+                      <span t-esc="o.invoice_date.strftime('%d/%m/%Y ')"/>
+                    </td>
+                    <td>
+                      <span t-esc="o.name"/>
+                    </td>
+                    <td>
+                      <span t-esc="o.partner_id.name"/>
+                    </td>
+                    <td>
+                      <span t-esc="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                    </td>
+                    <td>
+                      <span t-esc="o.amount_total - o.amount_residual" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                    </td>
+                    <td>
+                      <span t-esc="o.amount_residual" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                    </td>
+                    <td>
+                      <span t-esc="o.partner_id.city"/>
+                    </td>
+                    <td>
+                      <span t-esc="o.team_id.name"/>
+                    </td>
+                  </tr>
+                  <t t-set="no" t-value="no+1"/>
+                </t>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </t>
+    </t>
+
+  </template>
+
+</odoo>

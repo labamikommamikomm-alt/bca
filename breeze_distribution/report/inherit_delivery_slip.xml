@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <template id="inherit_delivery_slip_document" inherit_id="stock.report_delivery_document">
+      <xpath expr="//div[@class='page']" position="before">
+          <style>
+              body {
+                  font-size: 9px;
+              }
+          </style>
+          </xpath>
+      <!-- <xpath expr="//t[@name='partner_header']" position="before">
+        <div name="company" class="row">
+          <div class="col-auto col-9">
+            <img t-att-src="image_data_uri(o.company_id.logo)" style="width:50px;height:30px;"/>
+          </div>
+          <div class="col-auto">
+            <t>
+              <b>
+                <span t-esc="o.company_id.name"/>
+              </b>
+            </t>
+            <br/>
+            <t>
+              <b>
+                <span t-esc="o.company_id.street"/>
+              </b>
+            </t>
+            <t>
+              <b>
+                <span t-esc="o.company_id.street2"/>
+              </b>
+            </t>
+            <t>
+              <b>
+                <t t-esc="o.company_id.city"/>
+                <t t-esc="o.company_id.state_id.name"/>
+                <t t-esc="o.company_id.zip"/>
+              </b>
+            </t>
+            <t>
+              <b>
+                <t t-esc="o.company_id.country_id.name"/>
+              </b>
+            </t>
+          </div>
+          <div class="col-auto">
+            <b>
+            <t>Telp : <t t-esc="o.company_id.phone"/>
+            </t>
+            <br/>
+            <t>Email : <t t-esc="o.company_id.email"/>
+            </t>
+            <br/>
+            <t>NPWP : <t t-esc="o.company_id.vat"/>
+            </t>
+            </b>
+          </div>
+        </div>
+      </xpath> -->
+      <xpath expr="//h2" position="before">
+        <div name="judul">
+          <div class="col-auto">
+
+          </div>
+          <div class="col-auto text-center">
+            <br />
+            <br />
+            <h2>Delivery Slip</h2>
+          </div>
+          <div class="col-auto">
+
+          </div>
+        </div>
+        <div name="judul2" class="row">
+          <div class="col-auto">
+          </div>
+          <div class="col-auto">
+          </div>
+          <div class="col-auto">
+            <t t-if="partner" name="partner_header">
+              <t>Kepada :
+                <div t-esc="partner" t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True}'/>
+              </t>
+            </t>
+          </div>
+        </div>
+      </xpath>
+      <xpath expr="//th[@name='th_sml_product']" position="before">
+        <th name="th_no">
+          <strong>No</strong>
+        </th>
+      </xpath>
+      <xpath expr="//t[@name='partner_header']" position="replace">
+        <t name="partner_header">
+        </t>
+      </xpath>
+      <xpath expr="//div[@name='signature']" position="before">
+        <div t-if="o.note" name="catatan" class="border border-dark">
+          <!-- <t t-if="o.note"> -->
+          <strong>Note</strong>
+          <p>
+            <t t-esc="o.note"/>
+          </p>
+          <!-- </t> -->
+        </div>
+      </xpath>
+      <xpath expr="//div[@name='div_sched_date']" position="after">
+        <div class="col-auto" name="div_sales">
+          <strong>Sales:</strong>
+          <p t-esc="o.check_sales()"/>
+        </div>
+      </xpath>
+      <xpath expr="//div[@name='signature']" position="after">
+        <div name="footer 2" class="row">
+          <div class="col-auto text-center">
+            <br/>
+            <p>Penerima</p>
+            <br/>
+            <br/>
+            <br/>
+
+            <hr style="height:1px;border-width:0; color:black; background-color:black;"/>
+          </div>
+          <div class="col-auto text-center">
+            <br/>
+            <p>Gudang</p>
+            <br/>
+            <br/>
+            <br/>
+
+            <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+          </div>
+          <div class="col-auto text-center">
+            <br/>
+            <p>Penanggung Jawab Teknis</p>
+            <br/>
+            <br/>
+            <br/>
+
+            <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+          </div>
+        </div>
+      </xpath>
+    </template>
+  </data>
+</odoo>

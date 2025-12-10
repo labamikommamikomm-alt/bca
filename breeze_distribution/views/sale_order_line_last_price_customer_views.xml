@@ -1,0 +1,44 @@
+<odoo>
+    <data>
+        <record id="product_last_price_customer_view_form" model="ir.ui.view">
+            <field name="name">product.last.price.customer.view.form</field>
+            <field name="model">product.last.price.customer</field>
+            <field name="arch" type="xml">
+                <form string="Last Price per Customer">
+                    <sheet>
+                        <group>
+                            <field name="product_id"/>
+                            <field name="partner_id"/>
+                            <field name="last_price"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="product_last_price_customer_view_tree" model="ir.ui.view">
+            <field name="name">product.last.price.customer.view.tree</field>
+            <field name="model">product.last.price.customer</field>
+            <field name="arch" type="xml">
+                <tree string="Last Price per Customer">
+                    <field name="product_id"/>
+                    <field name="partner_id"/>
+                    <field name="last_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="product_last_price_customer_action" model="ir.actions.act_window">
+            <field name="name">Last Prices per Customer</field>
+            <field name="res_model">product.last.price.customer</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_product_last_price_customer"
+                  name="Last Prices per Customer"
+                  parent="sale.menu_sale_config"
+                  action="product_last_price_customer_action"
+                  sequence="30"/>
+    </data>
+</odoo>

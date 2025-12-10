@@ -1,0 +1,22 @@
+<odoo>
+    <record id="view_partner_form_coretax" model="ir.ui.view">
+        <field name="name">res.partner.form.coretax</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales_purchases']" position="after">
+                <page name="faktur_pajak" string="Faktur Pajak">
+                    <group>
+                        <group>
+                            <field name="nama_npwp"/>
+                            <field name="alamat_npwp"/>
+                        </group>
+                        <group>
+                            <field name="kode_transaksi"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

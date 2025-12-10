@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_faktur" name="Report Faktur dengan Biaya Tambahan">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.internal_layout">
+                        <div class="page">
+                            <div class="row align-items-center">
+                                <div class="col-3">
+                                    <img t-att-src="image_data_uri(o.company_id.logo)" style="width:100px;height:60px;" />
+                                </div>
+                                <div class="col-5">
+                                    <h4 class="m-0">
+                                        <b>
+                                            <span t-esc="o.company_id.name" />
+                                        </b>
+                                    </h4>
+                                    <p class="m-0">
+                                        <span t-esc="o.company_id.street" />
+                                        <t t-if="o.company_id.street2">
+                                            <span t-esc="o.company_id.street2" />
+                                        </t>
+                                    </p>
+                                    <p class="m-0">
+                                        <span t-esc="o.company_id.city" />
+,
+                                        <span t-esc="o.company_id.state_id.name" />
+                                        <span t-esc="o.company_id.zip" />
+,
+                                        <span t-esc="o.company_id.country_id.name" />
+                                    </p>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <p class="m-0">Telp: <span t-esc="o.company_id.phone" />
+                                    </p>
+                                    <p class="m-0">Email: <span t-esc="o.company_id.email" />
+                                    </p>
+                                    <p class="m-0">NPWP: <span t-esc="o.company_id.vat" />
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-5">
+                                <h2>Input Pembelian</h2>
+                                <h4>
+                                    <span t-field="o.name"/>
+                                </h4>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-6">
+                                    <p>Tgl Cetak: <span t-esc="o.create_date.strftime('%d/%m/%Y ')" />
+                                    </p>
+                                    <p>Tgl Faktur: <span t-field="o.tanggal_faktur" t-options='{"widget": "date"}'/>
+                                    </p>
+                                    <p>Tgl Jatuh Tempo: <span t-field="o.invoice_date_due" t-options='{"widget": "date"}'/>
+                                    </p>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <p>No Faktur: <span t-field="o.ref"/>
+                                    </p>
+                                    <p>Supplier: <span t-field="o.partner_id.name"/>
+                                    </p>
+                                    <p>Alamat: 
+                                        <span t-field="o.partner_id.street"/>
+                                        <span t-field="o.partner_id.city"/>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <table class="table table-sm table-bordered">
+                                        <thead class="table-primary">
+                                            <tr>
+                                                <th class="text-center">No</th>
+                                                <th class="text-center">Kode Produk</th>
+                                                <th class="text-center">Nama Barang</th>
+                                                <th class="text-center">Qty</th>
+                                                <th class="text-end">Harga Beli</th>
+                                                <th class="text-end">Disc (%)</th>
+                                                <th class="text-end">Harga Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-set="number" t-value="1" />
+                                            <t t-foreach="o.invoice_line_ids.filtered(lambda line: not line.display_type)" t-as="line">
+                                                <tr>
+                                                    <td class="text-center">
+                                                        <span t-esc="number" />
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span t-field="line.product_id.barcode" />
+                                                    </td>
+                                                    <td>
+                                                        <span t-field="line.product_id.name" />
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span t-field="line.quantity" />
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": o.currency_id}' />
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <span t-field="line.discount" />
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": o.currency_id}' />
+                                                    </td>
+                                                </tr>
+                                                <t t-set="number" t-value="number+1" />
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="row mt-5">
+                                <div class="col-8">
+                                    <div class="row text-center">
+                                        <div class="col-3">
+                                            <p>Bag. Gudang</p>
+                                            <div style="height: 60px;"></div>
+                                            <hr class="w-100"/>
+                                        </div>
+                                        <div class="col-3">
+                                            <p>Bag. Hutang</p>
+                                            <div style="height: 60px;"></div>
+                                            <hr class="w-100"/>
+                                        </div>
+                                        <div class="col-3">
+                                            <p>Dibuat Oleh</p>
+                                            <div style="height: 60px;"></div>
+                                            <hr class="w-100"/>
+                                        </div>
+                                        <div class="col-3">
+                                            <p>Manajer</p>
+                                            <div style="height: 60px;"></div>
+                                            <hr class="w-100"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <table class="table table-borderless table-sm">
+                                        <tr>
+                                            <td>Total (Sebelum PPN)</td>
+                                            <td class="text-end">
+                                                <span t-field="o.amount_untaxed"/>
+                                            </td>
+                                        </tr>
+                                        <t t-if="o.extra_cost_journal_id">
+                                            <t t-foreach="o.extra_cost_journal_id.line_ids.filtered(lambda line: line.debit > 0 and line.account_id.internal_type != 'payable')" t-as="extra_line">
+                                                <tr>
+                                                    <td>
+                                                        <span t-esc="extra_line.name"/>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <span t-esc="extra_line.debit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </t>
+                                        <tr>
+                                            <td>PPN</td>
+                                            <td class="text-end">
+                                                <span t-field="o.amount_tax"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <strong>Grand Total</strong>
+                                            </td>
+                                            <td class="text-end">
+                                                <strong>
+                                                    <span t-field="o.grand_total_with_costs"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sudah Dibayarkan</td>
+                                            <td class="text-end">
+                                                <span t-esc="o.grand_total_with_costs - o.residual_with_costs" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <strong>Sisa Bayar</strong>
+                                            </td>
+                                            <td class="text-end">
+                                                <strong>
+                                                    <span t-field="o.residual_with_costs"/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <br />
+                            <t t-if="o.partner_id.bank_ids">
+                                <t t-foreach="o.partner_id.bank_ids" t-as="bank_id">
+                                    <p class="m-0">Nama Bank : <span t-esc="bank_id.bank_id.name" />
+                                    </p>
+                                    <p class="m-0">Nomor Rekening : <span t-esc="bank_id.acc_number" />
+                                    </p>
+                                </t>
+                            </t>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

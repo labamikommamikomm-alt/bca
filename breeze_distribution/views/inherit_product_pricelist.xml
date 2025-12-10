@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <record id="inherit_view_pricelist" model="ir.ui.view">
+        <field name="name">model.name.view.form.inherit.pricelist</field>
+        <field name="model">product.pricelist</field>
+        <field name="inherit_id" ref="product.product_pricelist_view"/>
+        <field name="arch" type="xml">
+            <field name="product_id" position="after">
+                <field name="uom" />
+            </field>
+        </field>
+    </record>
+
+</odoo>

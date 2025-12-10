@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <template id="inherit_report_purcasequotation_document"
+      inherit_id="purchase.report_purchasequotation_document">
+      <xpath expr="//div[@t-field='o.partner_id']" position="before">
+        <strong>To :</strong>
+      </xpath>
+      <xpath expr="//th[@name='th_description']" position="after">
+        <th name="th_confirmation_date" class="text-center">
+          <strong>Confirmation Date</strong>
+        </th>
+      </xpath>
+      <xpath expr="//td[@id='product']" position="after">
+        <td class="text-center">
+          <span t-field="o.date_approve" />
+        </td>
+      </xpath>
+      <xpath expr="//h2" position="replace">
+        <div class="text-center">
+          <h2>Purchase Order No <span t-field="o.name" /></h2>
+        </div>
+      </xpath>
+      <xpath expr="//td[@class='text-right']/span[@t-field='order_line.product_qty']"
+        position="replace">
+        <span t-field="order_line.product_qty" t-options='{"widget": "float", "precision": 0}' />
+      </xpath>
+      <xpath expr="//p[@t-field='o.notes']" position="after">
+        <div class="row">
+          <div class="col-auto text-center">
+            <p>Pengirim</p>
+            <br />
+            <br />
+            <br />
+            <br />
+            <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+          </div>
+          <div class="col-auto text-center">
+            <p>Penerima</p>
+            <br />
+            <br />
+            <br />
+            <br />
+            <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+          </div>
+        </div>
+      </xpath>
+    </template>
+  </data>
+</odoo>

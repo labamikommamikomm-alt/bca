@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+
+        <record id="inherit_color" model="ir.ui.view">
+            <field name="name">inherit_color</field>
+            <field name="inherit_id" ref="web.layout"/>
+            <field name="arch" type="xml">
+                <xpath expr="//body" position="inside">
+                    <style>.o_main_navbar {background-color: #6B3C3C!important;border-bottom: 0px;}</style>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+
+
+</odoo>
+

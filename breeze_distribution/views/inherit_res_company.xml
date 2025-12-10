@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="inherit_view_res_company" model="ir.ui.view">
+    <field name="name">model.name.view.form.inherit.res.company</field>
+    <field name="model">res.company</field>
+    <field name="inherit_id" ref="base.view_company_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='vat']" position="replace">
+        <field name="vat" string="NPWP" />
+      </xpath>
+      <field name="favicon" position="after">
+        <label for="nama_bank" string="Bank 1"/>
+        <div class="o_address_format">
+          <field name="nama_bank" placeholder="Nama Bank" class="o_address_street"/>
+          <field name="rek_bank" placeholder="Rekening Bank" class="o_address_street"/>
+          <field name="atas_nama" placeholder="Atas Nama" class="o_address_street"/>
+        </div>
+        <label for="nama_bank2" string="Bank 2"/>
+        <div class="o_address_format">
+          <field name="nama_bank2" placeholder="Nama Bank" class="o_address_street"/>
+          <field name="rek_bank2" placeholder="Rekening Bank" class="o_address_street"/>
+          <field name="atas_nama2" placeholder="Atas Nama" class="o_address_street"/>
+        </div>
+      </field>
+    </field>
+  </record>
+
+</odoo>

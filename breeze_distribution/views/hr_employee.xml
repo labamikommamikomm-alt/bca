@@ -1,0 +1,28 @@
+<odoo>
+
+    <data>
+    
+        <record id="hr_employee_form_view_inherit_uom" model="ir.ui.view">
+            <field name="name">Rekap Titipan</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form" />
+            <field name="arch" type="xml">
+              <notebook position="inside">
+                <page name="rekap_titipan" string="Rekap Titipan">
+                    <field name="rekap_ids" readonly="1">
+                        <tree editable="top">
+                            <field name="tanggal" />
+                            <field name="invoice_id" />
+                            <field name="jumlah" />
+                            <field name="metode" />
+                        </tree>
+                    </field>
+                </page>
+              </notebook>
+            </field>
+          </record>
+    
+    </data>
+    
+
+</odoo>

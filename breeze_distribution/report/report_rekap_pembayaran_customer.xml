@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <template id="report_rekap_pembayaran_customer">
+    <t t-call="web.html_container">
+      <t t-call="web.external_layout">
+        <div class="page">
+          <div class="text-center">
+            <h2>REKAP PEMBAYARAN</h2>
+          </div>
+          <div name="header" class="row">
+            <!-- <t t-foreach='docs' t-as="o"> -->
+              <div class="col-auto">
+                <p>Tanggal : <span t-esc="docs[-1].invoice_date.strftime('%d/%m/%Y ')"/> sd 
+                <span t-esc="docs[0].invoice_date.strftime('%d/%m/%Y ')"/> 
+                </p>
+                <p>Customer : <span t-esc=""/>
+                </p>
+              </div>
+              <div class="col-auto">
+              </div>
+              <div class="col-auto">
+                <p>
+                  <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y ')"/>
+                </p>
+              </div>
+            <!-- </t> -->
+          </div>
+          <div name="tabel" class="row">
+            <table class="table table-sm table-bordered">
+              <thead class="table-primary">
+                <tr>
+                  <th name="th_no" scope="col">No</th>
+                  <th name="th_nota_penjualan" scope="col">Tanggal Faktur</th>
+                  <th name="th_tanggal_jual" scope="col">Tanggal Jual</th>
+                  <th name="th_customer" scope="col">Customer</th>
+                </tr>
+              </thead>
+              <tbody>
+                <t t-set="no" t-value="1"/>
+                <t t-foreach='docs' t-as="o">
+                  <tr>
+                    <td>
+                      <span t-esc="no"/>
+                    </td>
+                    <td>
+                      <span t-esc="o.name"/>
+                    </td>
+                    <td>
+                      <span t-esc="o.invoice_date.strftime('%d/%m/%Y ')"/>
+                    </td>
+                    <td>
+                      <span t-esc="o.partner_id.name"/>
+                    </td>
+                  </tr>
+                  <t t-set="no" t-value="no+1"/>
+                </t>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </t>
+    </t>
+
+  </template>
+
+</odoo>

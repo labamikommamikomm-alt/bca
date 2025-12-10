@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <template id="report_rekap_piutang_perkolektor">
+      <t t-call="web.html_container">
+      <t t-set="data_report_margin_top" t-value="5"/>
+      <t t-set="data_report_header_spacing" t-value="50"/>
+      <t t-set="data_report_dpi" t-value="110"/>
+        <t t-call="web.internal_layout">
+          <div class="page">
+            <div class="text-center">
+              <h3><span t-esc="company_name"/></h3>
+            </div>
+            <div class="text-center">
+              <h2>REKAP PIUTANG PERKOLEKTOR</h2>
+            </div>
+            <div name="header" class="row">
+            <!-- <t t-foreach='docs' t-as="o"> -->
+            <div class="col-auto">
+              
+            </div>
+            <div class="col-auto">
+            <p>Tanggal : <span t-esc="data['date_from']" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/> sd 
+              <span t-esc="data['date_to']" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+            </p>
+            </div>
+            <div class="col-auto">
+            </div>
+            </div>
+            <div name="tabel" class="row">
+              <table class="table table-sm table-bordered">
+                <thead class="table-primary">
+                  <tr style="text-align:center">
+                    <th name="th_no" scope="col">No</th>
+                    <th name="th_kolektor" scope="col">Kolektor</th>
+                    <th name="th_piutang" scope="col">Piutang</th>
+                    <th name="th_terbayar" scope="col">Terbayar</th>
+                    <th name="th_sisa_piutang" scope="col">Sisa Piutang</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <t t-foreach='lines' t-as="line">
+                    <tr>
+                      <td style="text-align:center">
+                        <span t-esc="line_index + 1"/>
+                      </td>
+                      <td>
+                        <span t-esc="line['sales']"/>
+                      </td>
+                      <td style="text-align:right">
+                        <span t-esc="line['piutang']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                      </td>
+                      <td style="text-align:right">
+                        <span t-esc="line['terbayar']"  t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                      </td>
+                      <td style="text-align:right">
+                        <span t-esc="line['sisa']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                      </td>
+                    </tr>
+                  </t>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        
+        </t>
+      </t>
+
+    </template>
+  </data>
+</odoo>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <template id="report_rekap_pembayaran_piutang">
+    <t t-call="web.html_container">
+      <t t-set="data_report_margin_top" t-value="5"/>
+      <t t-set="data_report_header_spacing" t-value="50"/>
+      <t t-set="data_report_dpi" t-value="110"/>
+      <t t-call="web.internal_layout">
+        <div class="page">
+          <div class="text-center">
+            <h3><span t-esc="company_name"/></h3>
+          </div>
+          <div class="text-center">
+            <h2>LAPORAN PEMBAYARAN PIUTANG</h2>
+          </div>
+          <div name="tanggal">
+            <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/>
+          </div>
+          <div name="tabel" class="row">
+            <table class="table table-sm table-bordered">
+              <thead class="table-primary">
+                <tr>
+                  <th name="th_no" scope="col">No</th>
+                  <th name="th_faktur" scope="col">Faktur</th>
+                  <th name="th_tgl" scope="col">Tanggal</th>
+                  <th name="th_customer" scope="col">Customer</th>
+                  <th name="th_tgl_lunas" scope="col">Tgl lunas</th>
+                  <th name="th_keterangan" scope="col">Keterangan</th>
+                  <th name="th_admin" scope="col">Admin</th>
+                  <th name="th_saldo" scope="col">Saldo</th>
+                  <th name="th_ppn" scope="col">PPN</th>
+                  <th name="th_pph" scope="col">PPh</th>
+                  <th name="th_bayar" scope="col">Bayar</th>
+                </tr>
+              </thead>
+              <tbody>
+                <t t-foreach="lines" t-as="line">
+                  <tr>
+                    <td colspan="10">
+                    Penagih : <span t-esc="line['penagih']"/>
+                    </td>
+                  </tr>
+                  <t t-foreach="line['lines']" t-as="linex">
+                    <tr>
+                      <td>
+                        <span t-esc="linex_index + 1"/>
+                      </td>
+                      <td>
+                        <span t-esc="linex['faktur']"/>
+                      </td>
+                      <td>
+                        <span t-esc="linex['tanggal'].strftime('%d/%m/%Y ')"/>
+                      </td>
+                      <td>
+                        <span t-esc="linex['customer']"/>
+                        (                        <span t-esc="linex['sales']"/>
+)
+                      </td>
+                      <td>
+                        <t t-foreach="linex['tgl_lunas']" t-as="tgl_lunas">
+                          <span t-esc="tgl_lunas.strftime('%d/%m/%Y ')"/>
+                        </t>
+                      </td>
+                      <td>
+                        <span t-esc="linex['keterangan']"/>
+                        <t t-foreach="linex['jenis']" t-as="jenis">
+                          (                          <span t-esc="jenis"/>
+)
+                        </t>
+                      </td>
+                      <td>
+                        <t t-foreach="linex['taxes']" t-as="taxe">
+                          <t t-if="taxe['nama'] == 'admin'">
+                            <span t-esc="taxe['jumlah']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                          </t>
+                        </t>
+                      </td>
+                      <td>
+                        <span t-esc="linex['saldo']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                      </td>
+                      <td>
+                        <span t-esc="linex['ppn']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                      </td>
+                      <td>
+                        <t t-foreach="linex['taxes']" t-as="taxe">
+                          <t t-if="taxe['nama'] != 'admin'">
+                            <span t-esc="taxe['jumlah']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                          </t>
+                        </t>
+                      </td>
+                      <td>
+                        <span t-esc="linex['bayar']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                      </td>
+                    </tr>
+                  </t>
+                  <tr>
+                    <td colspan="6" class="text-center">
+                    Sub Total
+                    </td>
+                    <td>
+                      <span t-esc="line['total_admin']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>,
+
+                    </td>
+                    <td>
+                      <span t-esc="line['total_saldo']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                    </td>
+                    <td>
+                      <span t-esc="line['total_ppn']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                    </td>
+                    <td>
+                      <span t-esc="line['total_pph']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                    </td>
+                    <td>
+                      <span t-esc="line['total_bayar']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                    </td>
+                  </tr>
+                </t>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </t>
+    </t>
+
+  </template>
+
+</odoo>

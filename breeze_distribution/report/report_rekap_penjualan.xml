@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <template id="report_rekap_penjualan">
+    <t t-call="web.html_container">      
+      <t t-set="data_report_margin_top" t-value="5"/>
+      <t t-set="data_report_header_spacing" t-value="50"/>
+      <t t-call="web.internal_layout">
+      
+        <div class="page">
+          <div class="text-center">
+            <h3><span t-esc="company_name"/></h3>
+          </div>
+          <div class="text-center">
+            <h2>REKAP PENJUALAN <t t-esc="data['customer_id'][1]" /></h2>
+          </div>
+          <div name="tanggal">
+            <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/>
+          </div>
+        <div name="tabel" class="row">  
+          <table class="table table-sm table-bordered">
+            <thead class="table-primary">
+              <tr>
+                <th name="th_customer" scope="col">Customer</th>
+                <th name="th_tgl_faktur" scope="col">Tgl Penjualan</th>
+                <th name="th_no_nota" scope="col">Faktur</th>
+                <th name="th_nama_barang" scope="col">Nama Produk</th>
+                <th name="th_qty" scope="col">Qty</th>
+                <th name="th_sat" scope="col">Satuan</th>
+                <th name="th_harga_bruto_per_satuan" scope="col">Harga Bruto (per Satuan)</th>
+                <th name="th_diskon_persen" scope="col">Diskon (%)</th>
+                <th name="th_jumlah_bruto" scope="col">Jumlah Bruto</th>
+                <th name="th_jumlah_diskon" scope="col">Jumlah Diskon</th>
+                <th name="th_jumlah_netto" scope="col">Jumlah Netto</th>
+                <th name="th_sub_total" scope="col">Sub Total Faktur</th>
+                <th name="th_ppn" scope="col">PPN Faktur</th>
+                <th name="th_total_nota" scope="col">Total Faktur</th>
+              </tr>
+            </thead>
+            <tbody>
+              <t t-foreach="lines" t-as="invoice">
+                <t t-set="invoice_detail_count" t-value="len(invoice['invoice_lines_details'])"/>
+                <t t-foreach="invoice['invoice_lines_details']" t-as="detail_line" t-as-index="detail_index">
+                  <tr>
+                    <td t-if="detail_line['idx'] == 0" t-att-rowspan="invoice_detail_count" style="font-size: 15px;">
+                      <span t-esc="invoice['customer']"/>
+                    </td>
+                    <td t-if="detail_line['idx'] == 0" t-att-rowspan="invoice_detail_count">
+                      <span t-esc="invoice['tgl_faktur'].strftime('%d/%m/%Y ')"/>
+                    </td>
+                    <td t-if="detail_line['idx'] == 0" t-att-rowspan="invoice_detail_count">
+                      <span t-esc="invoice['faktur']"/>
+                    </td>
+                    
+                    <td style="font-size: 15px;">
+                      <span t-esc="detail_line['nama_barang']"/>
+                    </td>
+                    <td style="text-align: right">
+                      <span t-esc="detail_line['qty']"/>
+                    </td>
+                    <td>
+                      <span t-esc="detail_line['sat']"/>
+                    </td>
+                    <td style="text-align: right">
+                      <span t-esc="detail_line['harga_bruto_per_satuan']"
+                        t-options='{"widget": "monetary", "display_currency": invoice["currency_id"]}'/>
+                    </td>
+                    <td style="text-align: right">
+                      <span t-esc="detail_line['diskon_persen']"
+                        t-options='{"widget": "float", "precision": 2}'/>%
+                    </td>
+                    <td style="text-align: right">
+                      <span t-esc="detail_line['jumlah_bruto']"
+                        t-options='{"widget": "monetary", "display_currency": invoice["currency_id"]}'/>
+                    </td>
+                    <td style="text-align: right">
+                      <span t-esc="detail_line['jumlah_diskon']"
+                        t-options='{"widget": "monetary", "display_currency": invoice["currency_id"]}'/>
+                    </td>
+                    <td style="text-align: right">
+                      <span t-esc="detail_line['jumlah_netto']"
+                        t-options='{"widget": "monetary", "display_currency": invoice["currency_id"]}'/>
+                    </td>
+
+                    <td t-if="detail_line['idx'] == 0" t-att-rowspan="invoice_detail_count" style="text-align: right">
+                      <span t-esc="invoice['sub_total']"
+                        t-options='{"widget": "monetary", "display_currency": invoice["currency_id"]}'/>
+                    </td>
+                    <td t-if="detail_line['idx'] == 0" t-att-rowspan="invoice_detail_count" style="text-align: right">
+                      <span t-esc="invoice['ppn']"
+                        t-options='{"widget": "monetary", "display_currency": invoice["currency_id"]}'/>
+                    </td>
+                    <td t-if="detail_line['idx'] == 0" t-att-rowspan="invoice_detail_count" style="text-align: right">
+                      <span t-esc="invoice['total']"
+                        t-options='{"widget": "monetary", "display_currency": invoice["currency_id"]}'/>
+                    </td>
+                  </tr>
+                </t>
+              </t>
+            </tbody>
+            
+            <tfoot>
+              <tr>
+                <td colspan="11" class="text-center">
+                  Total Keseluruhan
+                </td>
+                <td>
+                  <span t-esc="tn" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                </td>
+                <td>
+                  <span t-esc="tp" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                </td>
+                <td>
+                  <span t-esc="total" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </t>
+  </t>
+
+</template>
+</odoo>

@@ -1,0 +1,38 @@
+<odoo>
+    <record id="view_move_form_coretax" model="ir.ui.view">
+        <field name="name">account.move.form.coretax</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="arch" type="xml">
+
+            <xpath expr="//header" position="inside">
+                <button name="%(coretax.action_export_coretax_wizard)d" type="action"
+                    string="Export for Coretax" class="oe_highlight"
+                    attrs="{'invisible': [('partner_is_pkp', '=', False)]}" />
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page name="coretax" string="Coretax"
+                    attrs="{'invisible': [('partner_is_pkp', '=', False)]}">
+                    <group>
+                        <field name="keterangan_coretax"
+                            placeholder="Isi keterangan untuk sheet Keterangan..." />
+                        <field name="partner_is_pkp"
+                            readonly="1" />
+                        <field name="jenis_faktur" />
+                        <field name="kode_transaksi" />
+                        <field name="keterangan_tambahan_faktur" string="Keterangan Tambahan" />
+                        <field name="cap_fasilitas" />
+                    </group>
+                    <field name="dokumen_referensi_ids">
+                        <tree string="Dokumen Referensi" editable="bottom">
+                            <field name="jenis_dokumen" />
+                            <field name="nomor_dokumen" />
+                            <field name="tanggal_dokumen" />
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

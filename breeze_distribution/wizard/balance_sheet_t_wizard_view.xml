@@ -1,0 +1,80 @@
+<odoo>
+    <record id="view_balance_sheet_t_wizard_form" model="ir.ui.view">
+        <field name="name">balance.sheet.t.wizard.form</field>
+        <field name="model">balance.sheet.t.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="filter_type" widget="radio" />
+                </group>
+
+                <group attrs="{'invisible': [('filter_type', '!=', 'standar')]}">
+                    <field name="date_from" />
+                    <field name="date_to" />
+                </group>
+
+                <group attrs="{'invisible': [('filter_type', '!=', 'multi')]}">
+                    <field name="multi_period_type" widget="radio" />
+                </group>
+                <group
+                    attrs="{'invisible': ['|', ('filter_type', '!=', 'multi'), ('multi_period_type', '!=', 'monthly')]}">
+                    <group>
+                        <field name="month_from" />
+                        <field name="year_for_month" />
+                    </group>
+                    <group>
+                        <field name="month_to" />
+                    </group>
+                </group>
+                <group
+                    attrs="{'invisible': ['|', ('filter_type', '!=', 'multi'), ('multi_period_type', '!=', 'yearly')]}">
+                    <field name="year_selection" />
+                </group>
+
+                <footer>
+                    <button name="action_print_report" string="Cetak" type="object"
+                        class="btn-primary" />
+                    <button string="Batal" class="btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_open_balance_sheet_t_wizard" model="ir.actions.act_window">
+        <field name="name">Neraca (Format T)</field>
+        <field name="res_model">balance.sheet.t.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="paperformat_balance_sheet_t_landscape" model="report.paperformat">
+        <field name="name">Neraca T Lanskap</field>
+        <field name="default" eval="True" />
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">20</field>
+        <field name="margin_bottom">15</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">15</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_balance_sheet_t" model="ir.actions.report">
+        <field name="name">Neraca (Format T)</field>
+        <field name="model">balance.sheet.t.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_balance_sheet_t</field>
+        <field name="report_file">breeze_distribution.report_balance_sheet_t</field>
+        <field name="print_report_name">'Neraca T - %s' % (object.date_to)</field>
+        <field name="paperformat_id" ref="breeze_distribution.paperformat_balance_sheet_t_landscape" />
+    </record>
+
+    <menuitem
+        id="menu_report_balance_sheet_t"
+        name="Neraca (Format T)"
+        parent="account.menu_finance_reports"
+        action="action_open_balance_sheet_t_wizard"
+        sequence="200" />
+</odoo>

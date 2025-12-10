@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <template id="inherit_report_inventory" inherit_id="stock.report_inventory">
+      <xpath expr="//h2" position="before">
+        <div name="company" class="row">
+          <div class="col-auto col-9">
+            <img t-att-src="image_data_uri(o.company_id.logo)" style="width:100px;height:60px;"/>
+          </div>
+          <div class="col-auto">
+            <t>
+              <b>
+                <span t-esc="o.company_id.name"/>
+              </b>
+            </t>
+            <br/>
+            <t>
+              <b>
+                <span t-esc="o.company_id.street"/>
+              </b>
+            </t>
+            <t>
+              <b>
+                <span t-esc="o.company_id.street2"/>
+              </b>
+            </t>
+            <t>
+              <b>
+                <t t-esc="o.company_id.city"/>
+                <t t-esc="o.company_id.state_id.name"/>
+                <t t-esc="o.company_id.zip"/>
+              </b>
+            </t>
+            <t>
+              <b>
+                <t t-esc="o.company_id.country_id.name"/>
+              </b>
+            </t>
+          </div>
+          <div class="col-auto">
+            <b>
+            <t>Telp : <t t-esc="o.company_id.phone"/>
+            </t>
+            <br/>
+            <t>Email : <t t-esc="o.company_id.email"/>
+            </t>
+            <br/>
+            <t>NPWP : <t t-esc="o.company_id.vat"/>
+            </t>
+            </b>
+          </div>
+        </div>
+      </xpath>
+      <xpath expr="//h2" position="replace">
+        <div name="titlee" class="text-center">
+          <h2>STOCK OPNAME <span t-esc="o.name"/></h2>
+        </div>
+      </xpath>
+    </template>
+  </data>
+</odoo>

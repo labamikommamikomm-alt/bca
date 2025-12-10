@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <template id="report_rekap_hasil_tagihan">
+    <t t-call="web.html_container">
+      <t t-set="data_report_margin_top" t-value="5"/>
+      <t t-set="data_report_header_spacing" t-value="50"/>
+      <t t-set="data_report_dpi" t-value="110"/>
+      <t t-call="web.internal_layout">
+        <div class="page">
+          <div class="text-center">
+            <h3><span t-esc="company_name"/></h3>
+          </div>
+          <div class="text-center">
+            <h2>REKAP LAPORAN HASIL TAGIH</h2>
+          </div>
+          <div name="header" class="row">
+            <!-- <t t-foreach='docs' t-as="o"> -->
+            <div class="col-auto">
+              
+            </div>
+            <div class="col-auto">
+            <p>Tanggal : <span t-esc="data['date_from']" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/> sd 
+              <span t-esc="data['date_to']" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+            </p>
+            </div>
+            <div class="col-auto">
+            </div>
+          <!-- </t> -->
+        </div>
+        <div name="tabel" class="row">
+          <table class="table table-sm table-bordered">
+            <thead class="table-primary">
+              <tr>
+                <th name="th_nama_sales" scope="col">Nama Sales</th>
+                <th name="th_cash" scope="col">Cash</th>
+                <th name="th_transfer" scope="col">Transfer</th>
+                <th name="th_total" scope="col">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <t t-foreach="lines" t-as="line">
+                <tr>
+                  <td>
+                    <span t-esc="line['sales']"/>
+                  </td>
+                  <td>
+                    <span t-esc="line['cash']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                  </td>
+                  <td>
+                    <span t-esc="line['transfer']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                  </td>
+                  <td>
+                    <span t-esc="line['total']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                  </td>
+                </tr>
+              </t>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </t>
+  </t>
+
+</template>
+
+</odoo>

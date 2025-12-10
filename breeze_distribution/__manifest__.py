@@ -1,0 +1,96 @@
+# -*- coding: utf-8 -*-
+{
+    'name': "breeze_distribution",
+
+    'summary': """
+        Short (1 phrase/line) summary of the module's purpose, used as
+        subtitle on modules listing or apps.openerp.com""",
+
+    'description': """
+        Long description of module's purpose
+    """,
+
+    'author': "My Company",
+    'website': "http://www.yourcompany.com",
+
+    # Categories can be used to filter modules in modules listing
+    # Check https://github.com/odoo/odoo/blob/14.0/odoo/addons/base/data/ir_module_category_data.xml
+    # for the full list
+    'category': 'Uncategorized',
+    'version': '0.1',
+
+    # any module necessary for this one to work correctly
+    'depends': ['base', 'stock', 'purchase', 'sale', 'hr', 'l10n_id_efaktur', 'peminjaman'],
+
+    # always loaded
+    'data': [
+        'security/ir.model.access.csv',
+        'views/color.xml',
+        'views/templates.xml',
+        'views/product.xml',
+        'views/product_exp.xml',
+        'views/stock_valuation.xml',
+        'views/stock_quant.xml',
+        'views/assignInvoiceToSales.xml',
+        'views/hr_employee.xml',
+        'views/inherit_res_partner.xml',
+        'views/global_tax.xml',
+        'views/res_config_settings.xml',
+        'views/inherit_journal_entries.xml',
+        'views/inherit_purchase_order.xml',
+        'report/paperformat.xml',
+        'report/daftarPenagihanSales.xml',
+        'report/batch_invoice.xml',
+        'report/report_faktur.xml',
+        'report/new_invoice.xml',
+        'report/new_report_delivery_slip.xml',
+        'views/reporting.xml',
+        'report/report_invoice_besar.xml',
+        'report/batch_invoice_piutang.xml',
+        'report/inherit_delivery_slip.xml',
+        'report/report_rekap_hutang_pembelian.xml',
+        'report/report_rekap_pembayaran_hutang.xml',
+        'report/report_bukti_pembayaran_vendor.xml',
+        'wizard/report_rekap_piutang.xml',
+        'wizard/report_rekap_hutang.xml',
+        'wizard/rekap_pembayaran_piutang.xml',
+        'wizard/report_rekap_penjualan.xml',
+        'wizard/report_rekap_pembelian.xml',
+        'wizard/report_rekap_pembayaran_hutang.xml',
+        'wizard/report_rekap_piutang_perkolektor.xml',
+        'wizard/report_rekap_hasil_tagihan.xml',
+        'wizard/stock_report_wizard_view.xml',
+        'wizard/balance_sheet_t_wizard_view.xml',
+        'report/report_profit_loss_view.xml',
+        'wizard/profit_loss_wizard_view.xml',
+        'report/report_general_ledger_view.xml',
+        'wizard/general_ledger_wizard_view.xml',
+        'report/inherit_delivery_slip_lines.xml',
+        'report/report_rekap_pembayaran.xml',
+        'report/report_balance_sheet_t.xml',
+        'report/report_rekap_piutang_perkolektor.xml',
+        'report/report_rekap_piutang.xml',
+        'report/report_rekap_penjualan.xml',
+        'report/report_rekap_pembelian.xml',
+        'report/report_rekap_pembayaran_piutang.xml',
+        'report/report_rekap_hutang.xml',
+        'report/inherit_request_for_quotations.xml',
+        'report/report_retur_penjualan.xml',
+        'report/report_hasil_tagihan.xml',
+        'report/inherit_report_stockinventory.xml',
+        'report/stock_report_template.xml',
+        'report/report.xml',
+        'wizard/inherit_register_payment.xml',
+        'views/inherit_product_pricelist.xml',
+        'views/inherit_res_company.xml',
+        'views/inherit_crm_team.xml',
+        'views/sale_order_line_last_price_customer_views.xml',
+        'views/account_custom_menu.xml'
+    ],
+    # only loaded in demonstration mode
+    'demo': [
+        'demo/demo.xml',
+    ],
+    'application':True,
+    'sequence': 0
+}

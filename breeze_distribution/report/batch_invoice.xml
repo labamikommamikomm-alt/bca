@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <template id="report_batchInvoice">
+    <t t-foreach="docs" t-as="b">
+      <t t-foreach="b.invoice_id" t-as="o">
+        <t t-call="web.html_container">
+          <t t-call="web.external_layout">
+            <div class="page">
+              <div name="header" class="row">
+                <div class="col-auto">
+                  <p>No Faktur : <t t-esc="o.name"/>
+                  </p>
+                  <p>Salesman : <span t-esc="team_id.name"/></p>
+                  <p>
+                    <t t-if="o.partner_id.type_customer != 'lainnya'">
+                      <t t-esc="o.code_inventory()"/>
+                    </t>
+                    <t t-else="o.partner_id.type_customer == 'lainnya'">
+                  FAKTUR INI BERFUNGSI SEBAGAI SURAT JALAN
+                    </t>
+                  </p>
+                </div>
+                <div class="col-auto text-center">
+                  <p class="font-weight-bold">FAKTUR</p>
+                  <br/>
+                  <p>Tgl <t t-esc="o.invoice_date.strftime('%d/%m/%Y ')"/>
+ Tgl JT <t t-esc="o.invoice_date_due.strftime('%d/%m/%Y ')"/>
+                </p>
+              </div>
+              <div class="col-auto">
+                <p>Kepada Yth</p>
+                <p>
+                  <t t-esc="o.partner_id.name"/>
+                </p>
+                <p>
+                  <t t-esc="o.partner_id.city"/>
+                </p>
+              </div>
+            </div>
+            <div name="tabel" class="row">
+              <table class="table table-sm table-bordered">
+                <thead class="table-primary">
+                  <tr>
+                    <th name="th_no" scope="col">No</th>
+                    <th name="th_nama_barang" scope="col">Nama Barang</th>
+                    <th name="th_qty" scope="col">Qty</th>
+                    <th name="th_satuan" scope="col">Satuan</th>
+                    <th name="th_harga_beli" scope="col">Harga</th>
+                    <th name="th_disc" scope="col">Disc (%)</th>
+                    <th name="th_netto" scope="col">Netto(Rp)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <t t-set="number" t-value="1"/>
+                  <t t-set="total_diskon" t-value="0"/>
+                  <t t-foreach="o.invoice_line_ids" t-as="line">
+                    <tr>
+                      <td>
+                        <span t-esc="number"/>
+                      </td>
+                      <td>
+                        <span t-esc="line.product_id.name"/>
+                      </td>
+                      <td>
+                        <span t-esc="line.quantity"/>
+                      </td>
+                      <td>
+                        <span t-esc="line.product_uom_id.name"/>
+                      </td>
+                      <td>
+                        <span t-esc="line.price_unit" t-options='{"widget": "monetary", "display_currency": line.currency_id}'/>
+                      </td>
+                      <td>
+                        <span t-esc="line.discount"/>
+                      </td>
+                      <td>
+                        <span t-esc="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": line.currency_id}'/>
+                      </td>
+                    </tr>
+                    <t t-set="number" t-value="number+1"/>
+                    <t t-set="total_diskon" t-value="total_diskon + (line.price_subtotal* line.discount/100)"/>
+                  </t>
+                </tbody>
+              </table>
+            </div>
+            <div name="footer 1" class="row">
+              <div class="col-auto">
+              </div>
+              <div class="col-auto font-weight-bold">
+                <p>Rek BCA: 046 803366 9</p>
+                <p>PT Anugerah Tunas Medica Utama</p>
+              </div>
+              <div class="col-auto">
+                <p>SUB TOTAL</p>
+                <p>PPN</p>
+                <p>TOTAL</p>
+              </div>
+              <div class="col-auto">
+                <p>:                  <t t-esc="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                </p>
+                <!-- <p>:              <t t-esc="total_diskon" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+            </p> -->
+                <p>:                  <t t-esc="o.amount_tax" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                </p>
+                <p>:                  <t t-esc="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                </p>
+              </div>
+            </div>
+            <div name="footer 2" class="row">
+              <div class="col-auto text-center">
+                <br/>
+                <p>Penerima</p>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <hr style="height:1px;border-width:0; color:black; background-color:black;"/>
+              </div>
+              <div class="col-auto text-center">
+                <br/>
+                <p>Gudang</p>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+              </div>
+              <div class="col-auto text-center">
+                <br/>
+                <p>Pengirim</p>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+                <p>
+                  <t t-esc="b.sales_id.name"/>
+                </p>
+              </div>
+              <div class="col-auto text-center">
+                <br/>
+                <p>Penanggung Jawab Teknis</p>
+                <br/>
+                <br/>
+                <br/>
+                <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+                <p>SAEFUL AMRI</p>
+              </div>
+              <div class="col-auto text-center">
+                <br/>
+                <p>Hormat Kami</p>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <hr style="height:1px; border-width:0; color:black; background-color:black;"/>
+                <p>H. RAMLI</p>
+              </div>
+            </div>
+          </div>
+        </t>
+      </t>
+
+    </t>
+  </t>
+</template>
+
+</odoo>

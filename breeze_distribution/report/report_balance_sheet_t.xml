@@ -1,0 +1,379 @@
+<odoo>
+    <template id="report_balance_sheet_t">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <div class="text-center mb-4">
+                        <h4 class="mb-0">NERACA</h4>
+                        <p t-if="not is_multi_period" class="mb-0">Per <span t-esc="date_to"
+                                t-options="{'widget': 'date'}" /></p>
+                    </div>
+
+                    <t t-if="len(column_headers) > 1">
+                        <table class="table table-sm table-borderless">
+                            <colgroup>
+                                <col style="width: 40%;" />
+                                <t t-foreach="column_headers" t-as="header">
+                                    <col
+                                        t-att-style="'width: %s;' % (60 / len(column_headers)) + '%'" />
+                                </t>
+                            </colgroup>
+                            <thead>
+                                <tr style="border-bottom: 2px solid black;">
+                                    <th class="text-left">AKTIVA</th>
+                                    <th t-foreach="column_headers" t-as="header" class="text-right">
+                                        <t t-esc="header" />
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class=""
+                                    style="background-color: white !important;">
+                                    <td t-att-colspan="1 + len(column_headers)" class="pt-2">AKTIVA
+                                        LANCAR</td>
+                                </tr>
+                                <tr t-foreach="data['aktiva_lancar']['lines']" t-as="line"
+                                    style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding-left: 20px;">
+                                        <span t-esc="line['name']" />
+                                    </td>
+                                    <td t-foreach="line['balances']" t-as="balance"
+                                        class="text-right">
+                                        <span t-esc="balance"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+                                <tr class="">
+                                    <td style="padding-left: 20px;">TOTAL AKTIVA LANCAR</td>
+                                    <td t-foreach="data['aktiva_lancar']['subtotals']"
+                                        t-as="subtotal" class="text-right border-top">
+                                        <span t-esc="subtotal"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+                                <tr class=""
+                                    style="background-color: white !important;">
+                                    <td t-att-colspan="1 + len(column_headers)" class="pt-3">AKTIVA
+                                        TETAP</td>
+                                </tr>
+                                <tr t-foreach="data['aktiva_tetap']['lines']" t-as="line"
+                                    style="border-bottom: 1px solid #e9ecef;">
+                                    <td
+                                        t-att-style="'padding-left: 40px;' if 'Akumulasi' in line['name'] else 'padding-left: 20px;'">
+                                        <span t-esc="line['name']" />
+                                    </td>
+                                    <td t-foreach="line['balances']" t-as="balance"
+                                        class="text-right">
+                                        <span t-if="'Akumulasi' in line['name']">(<span
+                                                t-esc="abs(balance)"
+                                                t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                            )</span>
+                                        <span t-else="" t-esc="balance"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+                                <tr class="">
+                                    <td style="padding-left: 20px;">NILAI BERSIH AKTIVA TETAP</td>
+                                    <td t-foreach="data['aktiva_tetap']['subtotals']"
+                                        t-as="subtotal" class="text-right border-top">
+                                        <span t-esc="subtotal"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class=""
+                                    style="border-top: 2px solid black; border-bottom: 2px solid black;">
+                                    <td>TOTAL AKTIVA</td>
+                                    <td t-foreach="total_assets_per_period" t-as="total"
+                                        class="text-right">
+                                        <span t-esc="total"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <table class="table table-sm table-borderless mt-4">
+                            <colgroup>
+                                <col style="width: 40%;" />
+                                <t t-foreach="column_headers" t-as="header">
+                                    <col
+                                        t-att-style="'width: %s;' % (60 / len(column_headers)) + '%'" />
+                                </t>
+                            </colgroup>
+                            <thead>
+                                <tr style="border-bottom: 2px solid black;">
+                                    <th class="text-left">PASIVA</th>
+                                    <th t-foreach="column_headers" t-as="header" class="text-right">
+                                        <t t-esc="header" />
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class=""
+                                    style="background-color: white !important;">
+                                    <td t-att-colspan="1 + len(column_headers)" class="pt-2">HUTANG
+                                        LANCAR</td>
+                                </tr>
+                                <tr t-foreach="data['hutang_lancar']['lines']" t-as="line"
+                                    style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding-left: 20px;">
+                                        <span t-esc="line['name']" />
+                                    </td>
+                                    <td t-foreach="line['balances']" t-as="balance"
+                                        class="text-right">
+                                        <span t-esc="balance"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+                                <tr class="">
+                                    <td style="padding-left: 20px;">TOTAL HUTANG LANCAR</td>
+                                    <td t-foreach="data['hutang_lancar']['subtotals']"
+                                        t-as="subtotal" class="text-right border-top">
+                                        <span t-esc="subtotal"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+                                <tr class=""
+                                    style="background-color: white !important;">
+                                    <td t-att-colspan="1 + len(column_headers)" class="pt-3">HUTANG
+                                        JANGKA PANJANG</td>
+                                </tr>
+                                <tr t-foreach="data['hutang_jangka_panjang']['lines']" t-as="line"
+                                    style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding-left: 20px;">
+                                        <span t-esc="line['name']" />
+                                    </td>
+                                    <td t-foreach="line['balances']" t-as="balance"
+                                        class="text-right">
+                                        <span t-esc="balance"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+                                <tr class="">
+                                    <td style="padding-left: 20px;">TOTAL HUTANG JANGKA PANJANG</td>
+                                    <td t-foreach="data['hutang_jangka_panjang']['subtotals']"
+                                        t-as="subtotal" class="text-right border-top">
+                                        <span t-esc="subtotal"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+                                <tr class=""
+                                    style="background-color: white !important;">
+                                    <td t-att-colspan="1 + len(column_headers)" class="pt-3">MODAL</td>
+                                </tr>
+                                <tr t-foreach="data['modal']['lines']" t-as="line"
+                                    style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding-left: 20px;">
+                                        <span t-esc="line['name']" />
+                                    </td>
+                                    <td t-foreach="line['balances']" t-as="balance"
+                                        class="text-right">
+                                        <span t-esc="balance"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding-left: 20px;">Laba (Rugi) Tahun Berjalan</td>
+                                    <td t-foreach="current_year_earnings" t-as="earning"
+                                        class="text-right">
+                                        <span t-esc="earning"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+                                <tr class="">
+                                    <td style="padding-left: 20px;">TOTAL MODAL</td>
+                                    <td t-foreach="data['modal']['subtotals']" t-as="subtotal"
+                                        class="text-right border-top">
+                                        <span t-esc="subtotal"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class=""
+                                    style="border-top: 2px solid black; border-bottom: 2px solid black;">
+                                    <td>TOTAL PASIVA</td>
+                                    <td t-foreach="total_liabilities_equity_per_period" t-as="total"
+                                        class="text-right">
+                                        <span t-esc="total"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </t>
+
+                    <t t-else="">
+                        <table class="table table-sm table-borderless">
+                            <thead>
+                                <tr style="border-bottom: 2px solid black;">
+                                    <th class="text-left" style="width: 35%;">AKTIVA</th>
+                                    <th class="text-right" style="width: 15%;">
+                                        <t t-esc="column_headers[0] if column_headers else ''" />
+                                    </th>
+                                    <th class="text-left" style="width: 35%;">PASIVA</th>
+                                    <th class="text-right" style="width: 15%;">
+                                        <t t-esc="column_headers[0] if column_headers else ''" />
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class=""
+                                    style="background-color: white !important;">
+                                    <td colspan="2" class="pt-2">AKTIVA LANCAR</td>
+
+                                    <td colspan="2">HUTANG LANCAR</td>
+                                </tr>
+                                <t t-set="al_lines" t-value="data['aktiva_lancar']['lines']" />
+                                <t t-set="hl_lines" t-value="data['hutang_lancar']['lines']" />
+                                <t t-set="max_len" t-value="max(len(al_lines), len(hl_lines))" />
+                                <tr t-foreach="range(max_len)" t-as="i"
+                                    style="border-bottom: 1px solid #e9ecef;">
+                                    <td>
+                                        <span
+                                            t-esc="al_lines[i]['name'] if i &lt; len(al_lines) else ''"
+                                            style="padding-left: 20px;" />
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-if="i &lt; len(al_lines)">
+                                            <span t-esc="al_lines[i]['balances'][0]"
+                                                t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                        </t>
+                                    </td>
+
+                                    <td>
+                                        <span
+                                            t-esc="hl_lines[i]['name'] if i &lt; len(hl_lines) else ''"
+                                            style="padding-left: 20px;" />
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-if="i &lt; len(hl_lines)">
+                                            <span t-esc="hl_lines[i]['balances'][0]"
+                                                t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr class="">
+                                    <td>TOTAL AKTIVA LANCAR</td>
+                                    <td class="text-right border-top">
+                                        <span t-esc="data['aktiva_lancar']['subtotals'][0]"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+
+                                    <td>TOTAL HUTANG LANCAR</td>
+                                    <td class="text-right border-top">
+                                        <span t-esc="data['hutang_lancar']['subtotals'][0]"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+
+                                <tr class=""
+                                    style="background-color: white !important;">
+                                    <td colspan="2" class="pt-3">AKTIVA TETAP</td>
+
+                                    <td colspan="2">HUTANG JANGKA PANJANG</td>
+                                </tr>
+                                <t t-set="at_lines" t-value="data['aktiva_tetap']['lines']" />
+                                <t t-set="hjp_lines"
+                                    t-value="data['hutang_jangka_panjang']['lines']" />
+                                <t t-set="max_len" t-value="max(len(at_lines), len(hjp_lines))" />
+                                <tr t-foreach="range(max_len)" t-as="i"
+                                    style="border-bottom: 1px solid #e9ecef;">
+                                    <td>
+                                        <span
+                                            t-att-style="'padding-left: 40px;' if i &lt; len(at_lines) and 'Akumulasi' in at_lines[i]['name'] else 'padding-left: 20px;'"
+                                            t-esc="at_lines[i]['name'] if i &lt; len(at_lines) else ''" />
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-if="i &lt; len(at_lines)">
+                                            <span t-if="'Akumulasi' in at_lines[i]['name']">(<span
+                                                    t-esc="abs(at_lines[i]['balances'][0])"
+                                                    t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                                )</span>
+                                            <span t-else="" t-esc="at_lines[i]['balances'][0]"
+                                                t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                        </t>
+                                    </td>
+
+                                    <td>
+                                        <span
+                                            t-esc="hjp_lines[i]['name'] if i &lt; len(hjp_lines) else ''"
+                                            style="padding-left: 20px;" />
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-if="i &lt; len(hjp_lines)">
+                                            <span t-esc="hjp_lines[i]['balances'][0]"
+                                                t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr class="">
+                                    <td>NILAI BERSIH AKTIVA TETAP</td>
+                                    <td class="text-right border-top">
+                                        <span t-esc="data['aktiva_tetap']['subtotals'][0]"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+
+                                    <td>TOTAL HUTANG JANGKA PANJANG</td>
+                                    <td class="text-right border-top">
+                                        <span t-esc="data['hutang_jangka_panjang']['subtotals'][0]"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+
+                                <tr class=""
+                                    style="background-color: white !important;">
+                                    <td colspan="2" class="pt-3"></td>
+
+                                    <td colspan="2">MODAL</td>
+                                </tr>
+                                <t t-set="m_lines"
+                                    t-value="data['modal']['lines'] + [{'name': 'Laba (Rugi) Tahun Berjalan', 'balances': current_year_earnings}]" />
+                                <tr t-foreach="m_lines" t-as="line"
+                                    style="border-bottom: 1px solid #e9ecef;">
+                                    <td colspan="2"></td>
+
+                                    <td>
+                                        <span t-esc="line['name']" style="padding-left: 20px;" />
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="line['balances'][0]"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+                                <tr class="">
+                                    <td colspan="2"></td>
+
+                                    <td>TOTAL MODAL</td>
+                                    <td class="text-right border-top">
+                                        <span t-esc="data['modal']['subtotals'][0]"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                            <tfoot>
+                                <tr class=""
+                                    style="border-top: 2px solid black; border-bottom: 2px solid black;">
+                                    <td>TOTAL AKTIVA</td>
+                                    <td class="text-right">
+                                        <span t-esc="total_assets_per_period[0]"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+
+                                    <td>TOTAL PASIVA</td>
+                                    <td class="text-right">
+                                        <span t-esc="total_liabilities_equity_per_period[0]"
+                                            t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

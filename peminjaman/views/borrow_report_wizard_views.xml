@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="report_borrow_return_wizard_form_view" model="ir.ui.view">
+        <field name="name">report.borrow.return.wizard.form</field>
+        <field name="model">report.borrow.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Laporan Peminjaman/Pengembalian">
+                <group>
+                    <group>
+                        <field name="start_date"/>
+                        <field name="end_date"/>
+                        <field name="partner_id"/>
+                    </group>
+                    <group>
+                        <field name="report_type"/>
+                        <field name="show_returned_items" attrs="{'invisible': [('report_type', '!=', 'borrowed')]}"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="check_report" string="Cetak" type="object" class="btn-primary"/>
+                    <button string="Batal" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="report_borrow_return_wizard_action" model="ir.actions.act_window">
+        <field name="name">Laporan Peminjaman &amp; Pengembalian</field>
+        <field name="res_model">report.borrow.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_borrow_report"
+        name="Laporan Peminjaman"
+        parent="menu_main_peminjaman"
+        action="report_borrow_return_wizard_action"
+        sequence="90"/>
+
+</odoo>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <template id="inherit_stock_report_delivery_aggregated_move_lines" inherit_id="stock.stock_report_delivery_aggregated_move_lines">
+      <xpath expr="//td" position="before">
+        <td>
+          <span t-esc="line_index + 1"/>
+        </td>
+      </xpath>
+      <xpath expr="//td[@name='move_line_aggregated_qty_done']" position="replace">
+        <td class="text-center" name="move_line_aggregated_qty_done">
+          <span t-esc="'%.0f' % aggregated_lines[line]['qty_done']"/>
+          <span t-esc="aggregated_lines[line]['product_uom']"/>
+        </td>
+      </xpath>
+    </template>
+
+    <template id="inherit_stock_report_delivery_has_serial_move_line" inherit_id="stock.stock_report_delivery_has_serial_move_line">
+      <xpath expr="//td" position="before">
+        <td>
+          <span t-esc="move_line_index + 1"/>
+        </td>
+      </xpath>
+    </template>
+    <template id="inherit_serial_qty_no_float" inherit_id="stock.stock_report_delivery_has_serial_move_line">
+
+      <xpath expr="//td[@name='move_line_lot_qty_done']" position="replace">
+
+        <td class="text-center" name="move_line_lot_qty_done">
+
+          <span t-esc="'%.0f'%move_line.qty_done"/>
+
+          <span t-field="move_line.product_uom_id"/>
+        </td>
+      </xpath>
+    </template>
+  </data>
+</odoo>
+

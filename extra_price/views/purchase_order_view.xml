@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--
+            VIEW UNTUK PURCHASE ORDER
+        -->
+        <record id="view_purchase_order_form_extra_price" model="ir.ui.view">
+            <field name="name">purchase.order.form.extra.price</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form" />
+            <field name="arch" type="xml">
+                <!-- Menambahkan tab "Extra Price" di dalam notebook -->
+                <xpath expr="//notebook" position="inside">
+                    <page string="Extra Price" name="extra_price_lines">
+                        <field name="extra_price_line_ids" nolabel="1">
+                            <tree editable="bottom">
+                                <field name="label" />
+                                <field name="account_id" />
+                                <field name="amount" />
+                                <field name="currency_id" invisible="1" />
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+
+                <!-- [FIX] Mengganti grup total yang ada dengan yang baru, menggunakan xpath yang lebih stabil -->
+                <xpath expr="//field[@name='order_line']/following-sibling::group[hasclass('oe_subtotal_footer')]" position="replace">
+                    <group class="oe_subtotal_footer oe_right" name="amount_total">
+                        <field name="amount_untaxed" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        <field name="amount_tax" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        <div class="oe_subtotal_footer_separator oe_inline">
+                            <label for="amount_total"/>
+                        </div>
+                        <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+
+                        <!-- Menampilkan setiap baris biaya tambahan di footer PO -->
+                        <t t-foreach="extra_price_line_ids" t-as="extra_line">
+                            <span class="text-nowrap font-weight-bold" t-esc="extra_line.label"/>
+                            <span class="text-nowrap text-end" t-esc="extra_line.amount" t-options='{"widget": "monetary"}'/>
+                        </t>
+
+                        <field name="grand_total_with_costs" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <!--
+            VIEW UNTUK ACCOUNT MOVE (VENDOR BILL)
+        -->
+        <record id="view_move_form_extra_price" model="ir.ui.view">
+            <field name="name">account.move.form.extra.price</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//group[hasclass('oe_subtotal_footer')]" position="replace">
+                    <group class="oe_subtotal_footer oe_right" attrs="{'invisible': [('move_type', 'not in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund'))]}">
+                        <field name="amount_untaxed"/>
+                        <field name="amount_tax"/>
+                        <field name="amount_total" class="oe_subtotal_footer_separator"/>
+
+                        <!-- Menampilkan setiap baris biaya dari Jurnal terkait -->
+                        <t t-if="extra_cost_journal_id">
+                             <t t-foreach="extra_cost_journal_id.line_ids.filtered(lambda line: line.debit > 0)" t-as="cost_line">
+                                <span class="text-nowrap" t-esc="cost_line.name"/>
+                                <span class="text-nowrap text-end" t-esc="cost_line.debit" t-options='{"widget": "monetary"}'/>
+                            </t>
+                        </t>
+
+                        <field name="grand_total_with_costs" class="oe_subtotal_footer_separator"/>
+                        <field name="invoice_payments_widget" colspan="2" nolabel="1" widget="payment"/>
+                        <field name="residual_with_costs" class="oe_subtotal_footer_separator" attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

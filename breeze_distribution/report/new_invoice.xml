@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <template id="new_report_invoice">
+    <t t-call="web.html_container">
+      <t t-set="data_report_margin_top" t-value="30" />
+      <t t-set="data_report_header_spacing" t-value="50" />
+      <t t-set="data_report_dpi" t-value="110" />
+      <t t-call="web.internal_layout">
+        <t t-foreach='docs' t-as="o">
+          <div class="page" style="font-family: Arial, sans-serif">
+            <style>
+              .tab1 {
+              display: inline-block;
+              margin-left: 10px;
+              }
+              .tab2 {
+              display: inline-block;
+              margin-left: 15px;
+              }
+               .table-sm td {
+      padding: 0.5px;
+    }
+            </style>
+            <div style="margin-top: 17cm font-family: Courier, monospace;">
+              <h4 class="font-weight-bold text-center">FAKTUR</h4>
+            </div>
+            <div name="header" class="row" style="margin-bottom:5px;">
+              <div class="col-auto">
+                <t>No Faktur <span class="tab1" />
+:                <t t-esc="o.name" />
+              </t>
+              <br />
+              <t>Salesman <span class="tab2" />
+:              <span t-esc="o.team_id.name" />
+            </t>
+            <br />
+            <t>
+              <t t-if="o.partner_id.type_customer != 'lainnya'">
+                <t t-esc="o.code_inventory()" />
+              </t>
+              <t t-else="o.partner_id.type_customer == 'lainnya'">
+                    FAKTUR INI BERFUNGSI SEBAGAI SURAT JALAN
+              </t>
+            </t>
+          </div>
+          <div class="col-auto text-center">
+            <br />
+            <t>Tgl <t t-esc="o.invoice_date.strftime('%d/%m/%Y ')" />
+ Tgl JT <t t-esc="o.invoice_date_due.strftime('%d/%m/%Y ')" />
+          </t>
+        </div>
+        <div class="col-auto">
+          <t>Kepada Yth</t>
+          <br />
+          <t>
+            <t t-esc="o.partner_id.name" />
+          </t>
+          <br />
+          <t>
+            <t t-esc="o.partner_id.city" />
+          </t>
+        </div>
+      </div>
+      <div name="tabel" class="row">
+        <table class="table table-sm table-bordered">
+          <thead class="table-primary">
+            <tr>
+              <th name="th_no" class="text-center" scope="col">No</th>
+              <th name="th_nama_barang" class="text-center" scope="col">Nama Barang</th>
+              <th name="th_expired_date" class="text-center" scope="col">Expired Date</th>
+              <th name="th_qty" class="text-center" scope="col">Qty</th>
+              <th name="th_satuan" class="text-center" scope="col">Satuan</th>
+              <th name="th_harga_beli" class="text-center" scope="col">Harga</th>
+              <th name="th_disc" class="text-center" scope="col">Disc (%)</th>
+              <th name="th_netto" class="text-center" scope="col">Netto(Rp)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <t t-set="number" t-value="1" />
+            <t t-set="total_diskon" t-value="0" />
+            <t t-foreach="o.invoice_line_ids.filtered(lambda line: not line.name.startswith('Diskon Penjualan untuk'))" t-as="line">
+              <tr>
+                <td style="padding: 0.5px; text-align: center">
+                  <span t-esc="line_index + 1" />
+                </td>
+                <td style="padding: 0.5px;">
+                  <span t-esc="line.name.replace(' (Harga Bruto)', '')" />
+                </td>
+                <td style="padding: 0.5px;">
+                  <span t-esc="line.product_id.kadaluarsa" t-options='{"widget": "date","format": "dd/MM/yyyy"}' />
+                </td>
+                <td style="padding: 0.5px; text-align: center">
+                  <span t-esc="'%.0f'% line.quantity" />
+                </td>
+                <td style="padding: 0.5px; text-align: center">
+                  <span t-esc="line.product_uom_id.name" />
+                </td>
+                <td style="padding: 0.5px; text-align: right">
+                  <span t-esc="line.price_unit" t-options='{"widget": "monetary", "display_currency": line.currency_id}' />
+                </td>
+                <t t-set="so_discount" t-value="line.sale_line_ids[0].discount if line.sale_line_ids else line.discount"/>
+
+                <td style="padding: 0.5px; text-align: right">
+                  <span t-esc="so_discount" />
+                </td>
+
+                <td style="padding: 0.5px; text-align: right">
+                  <t t-set="final_subtotal" t-value="line.price_subtotal * (1 - (so_discount / 100.0))"/>
+
+                  <span t-esc="'{:,.0f}'.format(final_subtotal)" />
+                </td>
+              </tr>
+              <t t-set="number" t-value="number+1" />
+            </t>
+          </tbody>
+        </table>
+      </div>
+      <div name="footer 1" class="row">
+        <div class="col-7">
+          <div style="">
+            <strong>Rekening :</strong>
+            <table style="width: 100%; border: none;">
+              <tbody>
+                <t t-if="o.company_id.nama_bank and o.company_id.rek_bank">
+                  <tr>
+                    <td style="border: none; padding: 2px; width: 1%; white-space: nowrap; padding-right: 15px;">
+                      <t t-esc="o.company_id.nama_bank" />
+&#160;<t t-esc="o.company_id.rek_bank" />
+                    </td>
+                    <td style="border: none; padding: 2px;">
+                      <t t-esc="o.company_id.atas_nama" />
+                    </td>
+                  </tr>
+                </t>
+                <t t-if="o.company_id.nama_bank2 and o.company_id.rek_bank2">
+                  <tr>
+                    <td style="border: none; padding: 2px; width: 1%; white-space: nowrap; padding-right: 15px;">
+                      <t t-esc="o.company_id.nama_bank2" />
+&#160;<t t-esc="o.company_id.rek_bank2" />
+                    </td>
+                    <td style="border: none; padding: 2px;">
+                      <t t-esc="o.company_id.atas_nama2" />
+                    </td>
+                  </tr>
+                </t>
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+
+        <div class="col-5" style="">
+          <table class="table table-sm table-borderless">
+            <tr>
+              <th style="padding: 2px;" class="text-right">SUB TOTAL(Rp)</th>
+              <td class="text-right" style="padding: 2px;">
+                <t t-esc="'{:,.0f}'.format(o.amount_untaxed)" />
+              </td>
+            </tr>
+            <tr>
+              <th style="padding: 2px;" class="text-right">PPN(11%)(Rp)</th>
+              <td class="text-right" style="padding: 2px;">
+                <t t-esc="'{:,.0f}'.format(o.amount_tax)" />
+              </td>
+            </tr>
+            <tr>
+              <th style="padding: 2px;" class="text-right">TOTAL(Rp)</th>
+              <td class="text-right" style="padding: 2px;">
+                <t t-esc="'{:,.0f}'.format(o.amount_total)" />
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div style="margin-top: 5px;margin-bottom: 5px; padding-top: 5px; width:100%;"> Terbilang : <span style="border: 1px solid black; padding:5px;">
+        <t t-esc="o.bilangan()" />
+                    rupiah</span>
+    </div>
+    <div name="footer 2" class="row" style="margin-top: 20px;">
+      <div class="col-3 text-center">
+        <p>Penerima</p>
+        <br />
+        <br />
+        <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+      </div>
+      <div class="col-3 text-center">
+        <p>Gudang</p>
+        <br />
+        <br />
+        <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+      </div>
+      <div class="col-3 text-center">
+        <p>Penanggung Jawab</p>
+        <br />
+        <br />
+        <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+      </div>
+      <div class="col-3 text-center">
+        <p>Hormat Kami</p>
+        <br />
+        <br />
+        <hr style="height:1px; border-width:0; color:black; background-color:black;" />
+      </div>
+    </div>
+  </div>
+  <div class="footer" style="font-size: 10px;">
+    <div class="row">
+      <div class="col-auto text-left">
+        <t>Batas complain dan retur maksimal 1 minggu setelah pengiriman barang</t>
+      </div>
+      <div class="col-auto text-right">
+        <t>
+          <i>Printed On : <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')" />
+          </i>
+        </t>
+      </div>
+    </div>
+  </div>
+</t>
+</t>
+</t>
+</template>
+
+</odoo>

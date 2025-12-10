@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <template id="report_bukti_pembayaran">
+    <t t-call="web.html_container">
+      <t t-set="data_report_margin_top" t-value="5"/>
+      <t t-set="data_report_header_spacing" t-value="50"/>
+      <t t-call="web.internal_layout">
+        <div class="page">
+          <div class="text-center">
+            <h3><span t-esc="docs.company_id.name"/></h3>
+            <br/>
+            <h2>Bukti Pembayaran</h2>
+          </div>
+          <div name="tabel" class="row">
+            <table class="table table-sm table-bordered">
+              <thead class="table-primary">
+                <tr>
+                  <th name="th_no" scope="col">No</th>
+                  <th name="th_tanggal_bayar" scope="col">Tanggal Bayar</th>
+                  <th name="th_tanggal_faktur" scope="col">Tanggal Faktur</th>
+                  <th name="th_no_faktur" scope="col">No Faktur</th>
+                  <th name="th_supplier" scope="col">Supplier</th>
+                  <th name="th_jumlah" scope="col">Jumlah</th>
+                  <th name="th_jenis_bayar" scope="col">Jenis Bayar</th>
+                </tr>
+              </thead>
+              <tbody>
+                <t t-set="no" t-value="1"/>
+                <t t-foreach='docs' t-as="o">
+                  <tr>
+                    <td>
+                      <span t-esc="no"/>
+                    </td>
+                    <td>
+                      <span t-esc="o.tanggal_bayar()"/>
+                    </td>
+                    <td>
+                      <span t-esc="o.invoice_date.strftime('%d/%m/%Y ')"/>
+                    </td>
+                    <td>
+                      <span t-esc="o.name"/>
+                    </td>
+                    <td>
+                      <span t-esc="o.partner_id.name"/>
+                    </td>
+                    <td>
+                      <span t-esc="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                    </td>
+                    <td>
+                      <span t-esc="o.jenis_pembayaran()"/>
+                    </td>
+                  </tr>
+                  <t t-set="no" t-value="no+1"/>
+                </t>
+              </tbody>
+            </table>
+          </div>
+          <div name="footer" class="row">
+          <div class="col-auto text-center">
+            <br/>
+            <p>Manager</p>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <hr style="height:1px;border-width:0; color:black; background-color:black;"/>
+          </div>
+          <div class="col-auto text-center">
+            <br/>
+            <p>Bagian Hutang</p>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+          </div>
+        </div>
+        </div>
+      </t>
+    </t>
+
+  </template>
+
+</odoo>

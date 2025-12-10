@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <template id="report_rekap_pembayaran">
+    <t t-call="web.html_container">
+      <t t-call="web.external_layout">
+        <div class="page">
+          <div class="text-center">
+            <h2>LAPORAN REKAP PEMBAYARAN</h2>
+          </div>
+          <div name="header" class="row">
+            <!-- <t t-foreach='docs' t-as="o"> -->
+            <div class="col-auto">
+              <p>Tanggal : <span t-esc="docs[-1].invoice_date.strftime('%d/%m/%Y ')"/>
+ sd 
+              <span t-esc="docs[0].invoice_date.strftime('%d/%m/%Y ')"/>
+            </p>
+          </div>
+          <div class="col-auto">
+          </div>
+          <div class="col-auto">
+            <p>
+              <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y ')"/>
+            </p>
+          </div>
+          <!-- </t> -->
+        </div>
+        <div name="tabel" class="row">
+          <table class="table table-sm table-bordered">
+            <thead class="table-primary">
+              <tr>
+                <th name="th_no" scope="col">No</th>
+                <th name="th_tanggal_jual" scope="col">Tanggal Faktur</th>
+                <th name="th_nota_penjualan" scope="col">No Faktur</th>
+                <th name="th_customer" scope="col">Customer</th>
+                <th name="th_piutang" scope="col">Jumlah</th>
+                <th name="th_taxes" scope="col">Taxes</th>
+                <th name="th_total_bayar" scope="col">Total Bayar</th>
+                <th name="th_metode" scope="col">Metode Pembayaran</th>
+                <th name="th_ket" scope="col">Ket</th>
+              </tr>
+            </thead>
+            <tbody>
+              <t t-set="total_diskon" t-value="0"/>
+              <t t-foreach='docs' t-as="o">
+                <t t-set="total_diskon" t-value="total_diskon + (o.invoice_line_ids.price_subtotal* o.invoice_line_ids.discount/100)"/>
+                <tr>
+                  <td>
+                    <span t-esc="no"/>
+                  </td>
+                  <td>
+                    <span t-esc="o.invoice_date.strftime('%d/%m/%Y ')"/>
+                  </td>
+                  <td>
+                    <span t-esc="o.name"/>
+                  </td>
+                  <td>
+                    <span t-esc="o.partner_id.name"/>
+                  </td>
+                  <td>
+                    <span t-esc="o.amount_total - total_diskon" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                  </td>
+                  <td>
+                    <t t-foreach='o.global_tax_ids' t-as="a">
+                      <span t-esc="a.global_tax_id.name"/> : <span t-esc="a.amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                    </t>
+                  </td>
+                  <td>
+                    <span t-esc="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                  </td>
+                  <td>
+                    <span t-esc="o.jenis_pembayaran()"/>
+                  </td>
+                  <td>
+                    <span t-esc="o.ref"/>
+                  </td>
+                </tr>
+              </t>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </t>
+  </t>
+
+</template>
+
+</odoo>

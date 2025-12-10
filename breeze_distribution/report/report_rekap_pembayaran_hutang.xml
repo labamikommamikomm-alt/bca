@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <template id="report_rekap_pembayaran_hutang">
+    <t t-call="web.html_container">
+      <t t-set="data_report_margin_top" t-value="5"/>
+      <t t-set="data_report_header_spacing" t-value="50"/>
+      <t t-set="data_report_dpi" t-value="110"/>
+      <t t-call="web.internal_layout">
+        <div class="page">
+          <div class="text-center">
+            <h3><span t-esc="company_name"/></h3>
+          </div>
+          <div class="text-center">
+            <h2>REKAP PEMBAYARAN HUTANG</h2>
+          </div>
+          <div name="header" class="row">
+              <div class="col-auto">
+                <p>Tanggal : <span t-esc="data['date_from']" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/> sd 
+              <span t-esc="data['date_to']" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/></p>
+              </div>
+              <div class="col-auto">
+              </div>
+              <div class="col-auto">
+                <p>
+                  <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/>
+                </p>
+              </div>
+          </div>
+          <div name="tabel" class="row">
+            <table class="table table-sm table-bordered">
+              <thead class="table-primary">
+                <tr>
+                  <th name="th_no" scope="col">No</th>
+                  <th name="th_tanggal_faktur" scope="col">Tanggal Faktur</th>
+                  <th name="th_no_faktur" scope="col">No Faktur</th>
+                  <th name="th_nama_suplier" scope="col">Nama Supplier</th>
+                  <th name="th_jumlah" scope="col">Jumlah</th>
+                  <th name="th_jenis_pembayaran" scope="col">Jenis Pembayaran</th>
+                  <th name="th_tanggal_pembayaran" scope="col">Tanggal Pembayaran</th>
+                </tr>
+              </thead>
+              <tbody>
+                <t t-foreach='lines' t-as="line">
+                  <tr>
+                    <td>
+                      <span t-esc="line_index + 1"/>
+                    </td>
+                    <td>
+                      <span t-esc="line['tanggal_faktur'].strftime('%d/%m/%Y ')"/>
+                    </td>
+                    <td>
+                      <span t-esc="line['no_faktur']"/>
+                    </td>
+                    <td>
+                      <span t-esc="line['customer']"/>
+                    </td>
+                    <td>
+                      <span t-esc="line['jumlah']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                    </td>
+                    <td>
+                      <t t-foreach="line['jenis_pembayaran']" t-as="jenis">
+                        <span t-esc="jenis"/>
+                      </t>
+                    </td>
+                    <td>
+                      <t t-foreach="line['tanggal_bayar']" t-as="tanggal">
+                        <span t-esc="tanggal" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                      </t>
+                    </td>
+                  </tr>
+                </t>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="4" class="text-center">
+                    Total
+                  </td>
+                  <td>
+                    <span t-esc="total" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                  </td>
+                  <td colspan="2">
+                  </td>
+                </tr>
+            </tfoot>
+            </table>
+          </div>
+        </div>
+      </t>
+    </t>
+
+  </template>
+
+</odoo>

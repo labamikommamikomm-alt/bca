@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_export_coretax_wizard_form" model="ir.ui.view">
+        <field name="name">export.coretax.wizard.form</field>
+        <field name="model">export.coretax.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Export for Coretax">
+                <div>
+                    <p>Anda akan mengekspor invoice yang dipilih ke format Coretax.</p>
+                </div>
+                <footer>
+                    <!-- <button name="action_export_xlsx" type="object" string="Export XLSX" class="btn-primary" /> -->
+                    <button name="action_export_xml" type="object" string="Export XML" class="btn-primary" />
+                    <button string="Cancel" class="btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_export_coretax_wizard" model="ir.actions.act_window">
+        <field name="name">Export for Coretax</field>
+        <field name="res_model">export.coretax.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="account.model_account_move" />
+        <field name="binding_view_types">list,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="create_borrow_po_wizard_form_view" model="ir.ui.view">
+        <field name="name">create.borrow.po.wizard.form</field>
+        <field name="model">create.borrow.po.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Buat Peminjaman Barang">
+                <group>
+                    <group>
+                        <field name="partner_id" />
+                    </group>
+                    <group>
+                        <field name="date_order" />
+                    </group>
+                </group>
+                <notebook>
+                    <page string="Produk yang Dipinjam">
+                        <field name="borrow_line_ids" mode="tree">
+                            <tree string="Produk Peminjaman" editable="bottom">
+                                <control>
+                                    <create string="Tambah Produk" />
+                                </control>
+                                <field name="product_id"
+                                    domain="[('purchase_ok', '=', True)]"
+                                    force_save="1"
+                                    options="{'no_open': True, 'no_create': True}" />
+                                <field name="quantity" />
+                                <field name="uom_id" groups="uom.group_uom" />
+                                <field name="name" invisible="1" />
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+                <footer>
+                    <button name="action_create_borrow_po" string="Buat Purchase Order Peminjaman"
+                        type="object" class="btn-primary" />
+                    <button string="Batal" class="btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_create_borrow_po_wizard" model="ir.actions.act_window">
+        <field name="name">Peminjaman Barang (PO)</field>
+        <field name="res_model">create.borrow.po.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_main_peminjaman"
+        name="Peminjaman Dan Pengembalian"
+        parent="purchase.menu_purchase_root"
+        sequence="15" />
+
+    <menuitem id="menu_create_borrow_po"
+        name="Buat Peminjaman (PO)"
+        parent="menu_main_peminjaman"
+        action="action_create_borrow_po_wizard"
+        sequence="10" />
+
+</odoo>

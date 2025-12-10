@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="inherit_res_partner_form" model="ir.ui.view">
+    <field name="name">inherit res partner</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='vat']" position="after">
+        <field name="type_customer" />
+        <field name="nama_npwp" />
+        <label for="jalan_npwp" string="Alamat NPWP" />
+        <div>
+          <div class="o_address_format" name="div_address">
+            <field name="jalan_npwp" placeholder="Jalan..." class="o_address_street"/>
+            <field name="kota_npwp" placeholder="Kota" class="o_address_city"/>
+            <field name="provinsi_npwp_id" class="o_address_state" placeholder="Provinsi" options="{'no_open': True, 'no_quick_create': True}" context="{'country_id': country_id, 'default_country_id': country_id, 'zip': zip}"/>
+            <field name="kode_pos_npwp" placeholder="Kode Pos" class="o_address_zip"/>
+            <field name="negara_npwp_id" placeholder="Negara" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+          </div>
+        </div>
+
+        <field name="nik" />
+        <field name="nama_ktp" />
+        <label for="jalan_ktp" string="Alamat KTP" />
+        <div>
+          <div class="o_address_format" name="div_address">
+            <field name="jalan_ktp" placeholder="Jalan..." class="o_address_street"/>
+            <field name="kota_ktp" placeholder="Kota" class="o_address_city"/>
+            <field name="provinsi_ktp_id" class="o_address_state" placeholder="Provinsi" options="{'no_open': True, 'no_quick_create': True}" context="{'country_id': country_id, 'default_country_id': country_id, 'zip': zip}"/>
+            <field name="kode_pos_ktp" placeholder="Kode Pos" class="o_address_zip"/>
+            <field name="negara_ktp_id" placeholder="Negara" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+          </div>
+        </div>
+      </xpath>
+    </field>
+  </record>
+</odoo>

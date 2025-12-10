@@ -1,0 +1,76 @@
+<odoo>
+    <record id="view_profit_loss_wizard_form" model="ir.ui.view">
+        <field name="name">profit.loss.wizard.form</field>
+        <field name="model">profit.loss.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="filter_type" widget="radio" />
+                </group>
+                <group attrs="{'invisible': [('filter_type', '!=', 'standar')]}">
+                    <field name="date_from" />
+                    <field name="date_to" />
+                </group>
+                <group attrs="{'invisible': [('filter_type', '!=', 'multi')]}">
+                    <field name="multi_period_type" widget="radio" />
+                </group>
+                <group
+                    attrs="{'invisible': ['|', ('filter_type', '!=', 'multi'), ('multi_period_type', '!=', 'monthly')]}">
+                    <group>
+                        <field name="month_from" />
+                        <field name="year_for_month" />
+                    </group>
+                    <group>
+                        <field name="month_to" />
+                    </group>
+                </group>
+                <group
+                    attrs="{'invisible': ['|', ('filter_type', '!=', 'multi'), ('multi_period_type', '!=', 'yearly')]}">
+                    <field name="year_selection" />
+                </group>
+                <footer>
+                    <button name="action_print_report" string="Cetak" type="object"
+                        class="btn-primary" />
+                    <button string="Batal" class="btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="paperformat_profit_loss_landscape" model="report.paperformat">
+        <field name="name">Laba Rugi Lanskap</field>
+        <field name="default" eval="True" />
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">20</field>
+        <field name="margin_bottom">15</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">15</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_profit_loss" model="ir.actions.report">
+        <field name="name">Laporan Laba Rugi</field>
+        <field name="model">profit.loss.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_profit_loss</field>
+        <field name="report_file">breeze_distribution.report_profit_loss</field>
+        <field name="print_report_name">'Laporan Laba Rugi - %s' % (object.date_to)</field>
+        <field name="paperformat_id" ref="breeze_distribution.paperformat_profit_loss_landscape" />
+    </record>
+
+    <record id="action_open_profit_loss_wizard" model="ir.actions.act_window">
+        <field name="name">Laporan Laba Rugi</field>
+        <field name="res_model">profit.loss.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem
+        id="menu_report_profit_loss"
+        name="Laporan Laba Rugi"
+        parent="account.menu_finance_reports"
+        action="action_open_profit_loss_wizard"
+        sequence="201" />
+</odoo>

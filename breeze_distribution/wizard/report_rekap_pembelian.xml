@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="report_rekap_pembelian_view" model="ir.ui.view">
+        <field name="name">Rekap Pembelian</field>
+        <field name="model">report.rekap_pembelian</field>
+        <field name="arch" type="xml">
+            <form string="Report Options">
+                <group>
+                    <group>
+                        <field name="start_date"/>
+                        <field name="end_date"/>
+                    </group>
+                    <group>
+                        <field name="supplier"/>
+                        <!-- Tambahkan field baru di sini agar muncul di form -->
+                        <field name="show_invoice_total"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="check_report" string="Print" type="object" default_focus="1" class="oe_highlight"/>
+                    <button name="export_excel" string="Export (Excel)" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pembelian_menu" model="ir.actions.act_window">
+        <field name="name">Rekap Pembelian</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">report.rekap_pembelian</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="report_rekap_pembelian_view"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_pembelian" name="Rekap Pembelian" sequence="20" parent="purchase.menu_purchase_root" action="action_pembelian_menu" groups="purchase.group_purchase_manager,purchase.group_purchase_user" />
+
+</odoo>

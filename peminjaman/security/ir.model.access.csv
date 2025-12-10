@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_borrow_report_wizard,report.borrow.report.wizard,model_report_borrow_report_wizard,base.group_user,1,1,1,1
+access_report_peminjaman_borrow_report_template,report.peminjaman.borrow_report_template,model_report_peminjaman_borrow_report_template,base.group_user,1,1,1,1
+access_create_borrow_po_wizard,create.borrow.po.wizard,model_create_borrow_po_wizard,base.group_user,1,1,1,1
+access_create_return_so_wizard,create.return.so.wizard,model_create_return_so_wizard,base.group_user,1,1,1,1
+access_create_borrow_po_line_wizard,create.borrow.po.line.wizard,model_create_borrow_po_line_wizard,base.group_user,1,1,1,1
+access_create_return_so_line_wizard,create.return.so.line.wizard,model_create_return_so_line_wizard,base.group_user,1,1,1,1
