@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_in_invoice_bill_tree_inherit_costs" model="ir.ui.view">
+            <field name="name">account.move.bill.tree.inherit.costs</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_in_invoice_tree"/>
+            <field name="arch" type="xml">
+                
+                <xpath expr="//field[@name='amount_total_signed']" position="after">
+                    
+                    <field name="grand_total_with_costs" 
+                           string="Grand Total Biaya Tambahan" 
+                           widget="monetary" 
+                           optional="show" 
+                           decoration-bf="1"/>
+                           
+                </xpath>
+                
+            </field>
+        </record>
+    </data>
+</odoo>
