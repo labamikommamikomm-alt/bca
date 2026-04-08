@@ -21,6 +21,7 @@
           <field name="nama_bank2" placeholder="Nama Bank" class="o_address_street"/>
           <field name="rek_bank2" placeholder="Rekening Bank" class="o_address_street"/>
           <field name="atas_nama2" placeholder="Atas Nama" class="o_address_street"/>
+          <!-- <field name="invoice_branch_prefix" placeholder="Prefix Invoice"/> -->
         </div>
       </field>
     </field>

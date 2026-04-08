@@ -50,10 +50,13 @@ class ReportPembelian(models.AbstractModel):
         grand_sub_total = 0.0
         grand_ppn = 0.0
         grand_total_amount = 0.0
+        extra_price_headers = set()
+        grand_extra_totals = {}
 
         for rec in invoices:
             barangs = []
             currency_id = rec.currency_id
+            extra_costs = {}
             
             for product in rec.invoice_line_ids.filtered(lambda l: not l.display_type):
                 barangs.append({
@@ -76,8 +79,13 @@ class ReportPembelian(models.AbstractModel):
                         'jumlah': cost_line.debit,
                     })
                     total_extra_cost += cost_line.debit
+                    name = cost_line.name
+                    amount = cost_line.debit
+                    extra_costs[name] = extra_costs.get(name, 0.0) + amount
+                    extra_price_headers.add(name)
+                    grand_extra_totals[name] = grand_extra_totals.get(name, 0.0) + amount
 
-            sub_total_with_costs = rec.amount_untaxed + total_extra_cost
+            sub_total_with_costs = rec.amount_untaxed
             total_with_costs = rec.amount_total + total_extra_cost
             
             no_dok_val = rec.name
@@ -91,7 +99,8 @@ class ReportPembelian(models.AbstractModel):
                 'product': barangs,
                 'total': total_with_costs,
                 'ppn': rec.amount_tax,
-                'sub_total': sub_total_with_costs
+                'sub_total': sub_total_with_costs,
+                'extra_costs': extra_costs,
             }
             
             grand_sub_total += sub_total_with_costs
@@ -99,6 +108,7 @@ class ReportPembelian(models.AbstractModel):
             grand_total_amount += total_with_costs
             
         lines = list(rows.values())
+        extra_price_headers = sorted(extra_price_headers)
 
         current_datetime_formatted = fields.Datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
@@ -115,5 +125,7 @@ class ReportPembelian(models.AbstractModel):
             'grand_sub_total': grand_sub_total,
             'grand_ppn': grand_ppn,
             'grand_total_amount': grand_total_amount,
+            'extra_price_headers': extra_price_headers,
+            'grand_extra_totals': grand_extra_totals,
         }
     

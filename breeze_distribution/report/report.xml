@@ -40,7 +40,7 @@
         <field name="binding_model_id" ref="account.model_account_move" />
         <field name="binding_type">report</field>
     </record>
-    
+
     <record id="report_new_delivery_slip" model="ir.actions.report">
         <field name="name">Surat Jalan ATMU A5</field>
         <field name="model">stock.picking</field>
@@ -162,13 +162,12 @@
     </record>
 
     <record id="report_return_penjualan" model="ir.actions.report">
-        <field name="name">Retur Penjualan</field>
+        <field name="name">Retur Barang (Dynamic)</field>
         <field name="model">stock.picking</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">breeze_distribution.report_return_deliveryslip</field>
         <field name="report_file">breeze_distribution.report_return_deliveryslip</field>
-        <field name="print_report_name">'Retur Penjualan - %s - %s' % (object.partner_id.name or '',
-            object.name)</field>
+        <field name="print_report_name">"Retur Barang"</field>
         <field name="binding_model_id" ref="model_stock_picking" />
         <field name="binding_type">report</field>
     </record>
@@ -187,5 +186,13 @@
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">breeze_distribution.report_rekap_hasil_tagihan</field>
         <field name="report_file">breeze_distribution.report_rekap_hasil_tagihan</field>
+    </record>
+
+    <record id="report_invoice_recap_action" model="ir.actions.report">
+        <field name="name">Laporan Rekap Invoice</field>
+        <field name="model">export.invoice.recap.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_invoice_recap</field>
+        <field name="report_file">breeze_distribution.report_invoice_recap</field>
     </record>
 </odoo>

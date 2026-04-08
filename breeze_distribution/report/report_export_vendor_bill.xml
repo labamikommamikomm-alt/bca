@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_export_vendor_bill_template">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page" style="font-size: 11px;">
+                    <div class="text-center mb-4">
+                        <h2>Rekap Pembayaran Hutang</h2>
+                    </div>
+
+                    <table class="table table-sm table-bordered">
+                        <thead style="background-color: #f2f2f2;">
+                            <tr>
+                                <th t-if="data.get('show_nomor')" class="text-center" style="width: 5%;">No.</th>
+                                <th t-if="data.get('show_nomor')" class="text-center">Nomor</th>
+                                <th t-if="data.get('show_partner')" class="text-center">Invoice Partner</th>
+                                <th t-if="data.get('show_date')" class="text-center">Tanggal Faktur</th>
+                                <th t-if="data.get('show_due_date')" class="text-center">Batas Waktu</th>
+                                <th t-if="data.get('show_ref')" class="text-center">Referensi</th>
+                                <th t-if="data.get('show_tax_number')" class="text-center">Tax Number</th>
+                                <th t-if="data.get('show_untaxed_amount')" class="text-right">Untaxed Amount</th>
+                                <th t-if="data.get('show_total')" class="text-right">Total</th>
+                                <th t-if="data.get('show_last_payment_date')" class="text-center">Tanggal Pembayaran</th>
+                                <th t-if="data.get('show_last_payment_method')" class="text-center">Metode Pembayaran</th>
+                                <th t-if="data.get('show_status')" class="text-center">Status Pembayaran</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="num" t-value="1"/>
+                            <t t-set="cumulative_grand_total" t-value="0.0"/>
+                            
+                            <t t-foreach="docs" t-as="o">
+                                <tr>
+                                    <td t-if="data.get('show_nomor')" class="text-center">
+                                        <span t-esc="num"/>
+                                    </td>
+                                    <td t-if="data.get('show_nomor')" class="text-center">
+                                        <span t-field="o.name"/>
+                                    </td>
+                                    <td t-if="data.get('show_partner')">
+                                        <span t-field="o.partner_id.display_name"/>
+                                    </td>
+                                    <td t-if="data.get('show_date')" class="text-center">
+                                        <span t-field="o.invoice_date" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                    <td t-if="data.get('show_due_date')" class="text-center">
+                                        <span t-field="o.invoice_date_due" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                    <td t-if="data.get('show_ref')" class="text-center">
+                                        <span t-field="o.ref"/>
+                                    </td>
+                                    <td t-if="data.get('show_tax_number')" class="text-center">
+                                        <span t-field="o.l10n_id_tax_number"/>
+                                    </td>
+                                    <td t-if="data.get('show_untaxed_amount')" class="text-right">
+                                        <span t-field="o.amount_untaxed_signed" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                                    </td>
+                                    <td t-if="data.get('show_total')" class="text-right">
+                                        <span t-field="o.amount_total_signed" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                                    </td>
+                                    <td t-if="data.get('show_last_payment_date')" class="text-center">
+                                        <span t-field="o.last_payment_date" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/>
+                                    </td>
+                                    <td t-if="data.get('show_last_payment_method')" class="text-center">
+                                        <span t-field="o.last_payment_method_name"/>
+                                    </td>
+                                    <td t-if="data.get('show_status')" class="text-center">
+                                        <span t-if="o.payment_state == 'not_paid'">Not Paid</span>
+                                        <span t-if="o.payment_state == 'in_payment'">In Payment</span>
+                                        <span t-if="o.payment_state == 'paid'">Paid</span>
+                                        <span t-if="o.payment_state == 'partial'">Partially Paid</span>
+                                        <span t-if="o.payment_state == 'reversed'">Reversed</span>
+                                        <span t-if="o.payment_state == 'invoicing_legacy'">Invoicing App Legacy</span>
+                                    </td>
+                                </tr>
+                                <t t-set="num" t-value="num + 1"/>
+                                <t t-if="data.get('show_grand_total')">
+                                    <t t-set="cumulative_grand_total" t-value="cumulative_grand_total + o.amount_total"/>
+                                </t>
+                            </t>
+                            
+                            <!-- Overall single row for Grand total at the bottom without tfoot -->
+                            <tr t-if="data.get('show_grand_total')" style="font-weight: bold; background-color: #f9f9f9;">
+                                <!-- Determine total spanned columns before Grand Total. We iterate logic mapping columns. 
+                                     Maximum cols is based on visible checkboxes excluding Grand Total logic itself
+                                -->
+                                <t t-set="colspan_count" t-value="0"/>
+                                <t t-if="data.get('show_nomor')"><t t-set="colspan_count" t-value="colspan_count + 2"/></t>
+                                <t t-if="data.get('show_partner')"><t t-set="colspan_count" t-value="colspan_count + 1"/></t>
+                                <t t-if="data.get('show_date')"><t t-set="colspan_count" t-value="colspan_count + 1"/></t>
+                                <t t-if="data.get('show_due_date')"><t t-set="colspan_count" t-value="colspan_count + 1"/></t>
+                                <t t-if="data.get('show_ref')"><t t-set="colspan_count" t-value="colspan_count + 1"/></t>
+                                <t t-if="data.get('show_tax_number')"><t t-set="colspan_count" t-value="colspan_count + 1"/></t>
+                                <t t-if="data.get('show_untaxed_amount')"><t t-set="colspan_count" t-value="colspan_count + 1"/></t>
+                                
+                                <td t-att-colspan="colspan_count" class="text-right">
+                                    Total Keseluruhan
+                                </td>
+                                <td class="text-right">
+                                    <span t-esc="cumulative_grand_total" t-options='{"widget": "monetary", "display_currency": docs[0].currency_id if docs else request.env.company.currency_id}'/>
+                                </td>
+                                
+                                <t t-if="data.get('show_last_payment_date')"><td/></t>
+                                <t t-if="data.get('show_last_payment_method')"><td/></t>
+                                <t t-if="data.get('show_status')"><td/></t>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_export_vendor_bill" model="ir.actions.report">
+        <field name="name">Ekspor Vendor Bill PDF</field>
+        <field name="model">wizard.export.vendor.bill</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">breeze_distribution.report_export_vendor_bill_template</field>
+        <field name="report_file">breeze_distribution.report_export_vendor_bill_template</field>
+        <field name="binding_model_id" eval="False" />
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <template id="report_invoice_recap">
+    <t t-call="web.html_container">
+      <t t-set="data_report_margin_top" t-value="5"/>
+      <t t-set="data_report_header_spacing" t-value="50"/>
+      <t t-set="data_report_dpi" t-value="110"/>
+      <t t-call="web.external_layout">
+        <div class="page">
+          <div class="text-center">
+            <h3>
+              <span t-esc="company_name"/>
+            </h3>
+          </div>
+          <div class="text-center">
+            <h2 style="text-transform: uppercase;">
+              <span t-esc="data.get('judul', 'REKAP INVOICE')"/>
+            </h2>
+          </div>
+          <div name="header" class="row mb-4">
+            <div class="col-6">
+            </div>
+            <div class="col-6 text-right">
+                <strong>Tanggal Cetak: </strong>
+                <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/>
+            </div>
+          </div>
+        <div name="tabel" class="row">
+          <table class="table table-sm table-bordered">
+            <thead class="table-primary">
+              <tr>
+                <th name="th_no" scope="col">No</th>
+                <th name="th_tanggal" scope="col">Tgl Faktur</th>
+                <th name="th_nota" scope="col">No Faktur</th>
+                <th name="th_customer" scope="col">Customer</th>
+                <th name="th_wilayah" scope="col">Wilayah/Kota</th>
+                <th name="th_sales" scope="col">Sales</th>
+                <th name="th_total" scope="col">Total Tagihan</th>
+                <th name="th_sisa" scope="col">Sisa Tagihan</th>
+                <th name="th_p_state" scope="col">Status Pembayaran</th>
+                <th name="th_i_state" scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <t t-foreach="lines" t-as="line">
+                <tr>
+                  <td>
+                    <span t-esc="line_index + 1"/>
+                  </td>
+                  <td>
+                    <span t-esc="line['tanggal_faktur'].strftime('%d/%m/%Y ') if line.get('tanggal_faktur') else ''"/>
+                  </td>
+                  <td>
+                    <span t-esc="line['no_faktur']"/>
+                  </td>
+                  <td>
+                    <span t-esc="line['customer']"/>
+                  </td>
+                  <td>
+                    <span t-esc="line['wilayah']"/>
+                  </td>
+                  <td>
+                    <span t-esc="line['sales']"/>
+                  </td>
+                  <td>
+                    <span t-esc="line['total_tagihan']" t-options='{"widget": "monetary", "display_currency": line["currency_id"]}'/>
+                  </td>
+                  <td>
+                    <span t-esc="line['sisa_tagihan']" t-options='{"widget": "monetary", "display_currency": line["currency_id"]}'/>
+                  </td>
+                  <td>
+                    <span t-esc="line['payment_state']"/>
+                  </td>
+                  <td>
+                    <span t-esc="line['state']"/>
+                  </td>
+                </tr>
+              </t>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </t>
+  </t>
+
+</template>
+
+</odoo>

@@ -1,42 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
     <record id="report_rekap_penjualan_view" model="ir.ui.view">
         <field name="name">Rekap Penjualan</field>
         <field name="model">report.rekap_penjualan</field>
         <field name="arch" type="xml">
             <form string="Report Options">
-                <group col="4">
-                    
-                    <field name="customer_id" />
+                <group>
+                    <group>
+                        <field name="customer_id" options="{'no_create': True}"/>
+                    </group>
+                    <group>
+                        <field name="date_from" required="1"/>
+                        <field name="date_to" required="1"/>
+                    </group>
                 </group>
                 <footer>
-                    <button name="check_report" string="Print" type="object" default_focus="1"
-                            class="oe_highlight"/>
-                    <button name="preview_report" string="Preview" type="object" default_focus="0"
-                            class="oe_highlight"/>
-                    <button string="Cancel" class="btn btn-default" special="cancel"/>
+                    <button name="check_report" string="Print" type="object" class="oe_highlight"/>
+                    <button string="Cancel" class="btn btn-secondary" special="cancel"/>
                 </footer>
             </form>
         </field>
     </record>
 
-    <record id="action_penjualan_menu" model="ir.actions.act_window">
+    <record id="action_rekap_penjualan_wizard" model="ir.actions.act_window">
         <field name="name">Rekap Penjualan</field>
-        <field name="type">ir.actions.act_window</field>
         <field name="res_model">report.rekap_penjualan</field>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="report_rekap_penjualan_view"/>
         <field name="target">new</field>
     </record>
 
-    <menuitem
-            id="menu_penjualan"
-            name="Rekap Penjualan"
-            sequence="10"
-            parent="sale.menu_sale_report"
-            action="action_penjualan_menu"
-            groups="sales_team.group_sale_manager"
-    />
+    <record id="report_rekap_penjualan_action" model="ir.actions.report">
+        <field name="name">Rekap Penjualan</field>
+        <field name="model">report.rekap_penjualan</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">breeze_distribution.report_rekap_penjualan</field>
+        <field name="report_file">breeze_distribution.report_rekap_penjualan</field>
+        <field name="binding_model_id" ref="model_report_rekap_penjualan"/>
+        <field name="binding_type">report</field>
+    </record>
 
+    <menuitem id="menu_rekap_penjualan"
+              name="Rekap Penjualan"
+              parent="sale.menu_sale_report"
+              action="action_rekap_penjualan_wizard"
+              sequence="10"/>
 </odoo>

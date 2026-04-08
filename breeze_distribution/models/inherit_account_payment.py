@@ -130,15 +130,17 @@ class InheritAccountPayment(models.Model):
         return res
 
     def _synchronize_from_moves(self, changed_fields):
-        # (metode ini tidak diubah dan seharusnya tidak menyebabkan error saat ini)
-        
-        # ... (kode _synchronize_from_moves tidak diubah)
-        # Hapus bagian ini jika tidak diperlukan, karena tidak ada masalah di sini saat ini.
+        ''' Update the account.payment regarding its related account.move.
+        Also, check both models are still consistent.
+        :param changed_fields: A set containing all modified fields on account.move.
+        '''
         if self._context.get('skip_account_move_synchronization'):
             return
 
         for pay in self.with_context(skip_account_move_synchronization=True):
 
+            # After the migration to 14.0, the journal entry could be shared between the account.payment and the
+            # account.bank.statement.line. In that case, the synchronization will only be made with the statement line.
             if pay.move_id.statement_line_id:
                 continue
 
@@ -162,6 +164,12 @@ class InheritAccountPayment(models.Model):
                         "- one journal item involving a receivable/payable account.\n"
                         "- optional journal items, all sharing the same account.\n\n"
                     ) % move.display_name)
+
+                # if writeoff_lines and len(writeoff_lines.account_id) != 1:
+                #     raise UserError(_(
+                #         "The journal entry %s reached an invalid state relative to its payment.\n"
+                #         "To be consistent, all the write-off journal items must share the same account."
+                #     ) % move.display_name)
 
                 if any(line.currency_id != all_lines[0].currency_id for line in all_lines):
                     raise UserError(_(

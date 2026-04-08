@@ -15,6 +15,7 @@
                         <field name="supplier"/>
                         <!-- Tambahkan field baru di sini agar muncul di form -->
                         <field name="show_invoice_total"/>
+                        <field name="show_product_info"/>
                     </group>
                 </group>
                 <footer>

@@ -6,7 +6,7 @@
       <t t-set="data_report_margin_top" t-value="5"/>
       <t t-set="data_report_header_spacing" t-value="50"/>
       <t t-set="data_report_dpi" t-value="110"/>
-        <t t-call="web.internal_layout">
+        <t t-call="web.external_layout">
           <div class="page">
             <div class="text-center">
               <h3><span t-esc="company_name"/></h3>

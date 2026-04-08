@@ -16,8 +16,23 @@ class ReportPiutang(models.AbstractModel):
         # form_data = data['form']
         # raise ValidationError(data['form']['from_date'])
 
-        invoice = self.env['account.move'].search([('journal_id.type', '=', 'sale'),
-            ('invoice_date', '>=', data['form']['date_from']), ('invoice_date', '<=', data['form']['date_to'])])
+        domain = [
+            ('journal_id.type', '=', 'sale'),
+            ('invoice_date', '>=', data['form']['date_from']),
+            ('invoice_date', '<=', data['form']['date_to'])
+        ]
+        
+        if data['form'].get('user_id'):
+            domain.append(('invoice_user_id', '=', data['form']['user_id'][0] if isinstance(data['form']['user_id'], list) else data['form']['user_id']))
+            
+        if data['form'].get('partner_id'):
+            domain.append(('partner_id', '=', data['form']['partner_id'][0] if isinstance(data['form']['partner_id'], list) else data['form']['partner_id']))
+            
+        state_filter = data['form'].get('payment_state', 'all')
+        if state_filter != 'all':
+            domain.append(('payment_state', '=', state_filter))
+
+        invoice = self.env['account.move'].search(domain)
         
         company = self.env['res.company'].sudo().search([])
 

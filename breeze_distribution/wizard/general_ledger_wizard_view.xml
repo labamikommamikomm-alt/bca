@@ -23,7 +23,7 @@
                         <button name="generate_report" string="Tampilkan Laporan" type="object"
                             class="btn-secondary" />
                         
-                        <button name="export_report" string="Export (CSV)" type="object"
+                        <button name="export_report" string="Export Excel" type="object"
                             class="btn-primary" />
                             
                         <button string="Batal" class="btn-secondary" special="cancel" />

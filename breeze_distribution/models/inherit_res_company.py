@@ -13,3 +13,9 @@ class InheritResCompany(models.Model):
     nama_bank2 = fields.Char(string="Nama Bank 2")
     rek_bank2 = fields.Char(string="Rekening Bank 2")
     atas_nama2 = fields.Char(string="Atas Nama 2")
+    # invoice_branch_prefix = fields.Char(
+    #     string='Invoice Branch Prefix',
+    #     help="Prefix karakter yang akan digunakan dalam penamaan faktur pajak kustom (misal: 'A').",
+    #     default='A',
+    #     required=True
+    # )

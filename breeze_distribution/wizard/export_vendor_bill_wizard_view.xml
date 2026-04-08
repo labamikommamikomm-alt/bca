@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_export_vendor_bill_wizard" model="ir.ui.view">
+        <field name="name">wizard.export.vendor.bill.form</field>
+        <field name="model">wizard.export.vendor.bill</field>
+        <field name="arch" type="xml">
+            <form string="Ekspor Data ke PDF">
+                <sheet>
+                    <div class="alert alert-info" role="alert" style="margin-bottom: 20px;">
+                        Pilih kolom-kolom yang ingin Anda ekspor ke dalam tabel PDF.
+                    </div>
+                    <group>
+                        <group string="Informasi Utama">
+                            <field name="show_nomor"/>
+                            <field name="show_partner"/>
+                            <field name="show_date"/>
+                            <field name="show_due_date"/>
+                            <field name="show_ref"/>
+                        </group>
+                        <group string="Nilai &amp; Status">
+                            <field name="show_tax_number"/>
+                            <field name="show_untaxed_amount"/>
+                            <field name="show_total"/>
+                            <field name="show_grand_total"/>
+                            <field name="show_last_payment_date"/>
+                            <field name="show_last_payment_method"/>
+                            <field name="show_status"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_print_pdf" string="Export PDF" type="object" class="btn-primary" icon="fa-print"/>
+                        <button name="export_excel" string="Export Excel" type="object" class="btn-success" icon="fa-file-excel-o"/>
+                        <button string="Batal" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Context action menu to appear in Vendor Bills tree view -->
+    <record id="action_export_vendor_bill_wizard" model="ir.actions.act_window">
+        <field name="name">Export PDF Vendor Bills</field>
+        <field name="res_model">wizard.export.vendor.bill</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_view_types">list</field>
+        <field name="domain">[("move_type", "in", ["in_invoice", "in_refund", "in_receipt"])]</field>
+    </record>
+</odoo>

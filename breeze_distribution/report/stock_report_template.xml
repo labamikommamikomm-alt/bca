@@ -6,14 +6,19 @@
                     <div class="text-center">
                         <h3>LAPORAN HASIL STOCK OPNAME</h3>
                         <h4>
-                        	PT. BERKAH CENTRAL ALKESTRON
+                            <t esc="company_name" />
                         </h4>
-                        <p>Periode: <span t-esc="start_date" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/> s.d. <span t-esc="end_date" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/></p>
+                        <p>Periode: <span t-esc="start_date"
+                                t-options='{"widget": "date", "format": "dd/MM/yyyy"}' /> s.d. <span
+                                t-esc="end_date"
+                                t-options='{"widget": "date", "format": "dd/MM/yyyy"}' /></p>
                     </div>
-                    
+
                     <table class="table table-sm table-bordered">
                         <thead>
-                            <tr class="text-center">
+                            <tr class="text-center"
+                                style="background-color: #f0f0f0; font-size: 10px;">
+                                <th>NO</th>
                                 <th>NAMA BARANG</th>
                                 <th>SATUAN</th>
                                 <th>SO AWAL</th>
@@ -23,47 +28,99 @@
                                 <th>SO FISIK</th>
                                 <th>SELISIH</th>
                                 <th>HARGA BELI</th>
+                                <th>JML SO FISIK</th>
                                 <th>JUMLAH SALDO</th>
                                 <th>JUMLAH SELISIH</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="font-size: 10px;">
                             <t t-foreach="report_lines" t-as="line">
                                 <tr>
-                                    <td><span t-esc="line['name']"/></td>
-                                    <td class="text-center"><span t-esc="line['satuan']"/></td>
-                                    <td class="text-right">
-                                        <t t-if="isinstance(line['so_awal'], str)">
-                                            <span>-</span>
-                                        </t>
-                                        <t t-else="">
-                                            <span t-esc="line['so_awal']" t-options='{"widget": "float", "precision": 2}'/>
-                                        </t>
+                                    <td class="text-center">
+                                        <span t-esc="line_index + 1" />
                                     </td>
-                                    <td class="text-right"><span t-esc="line['in_qty']" t-options='{"widget": "float", "precision": 2}'/></td>
-                                    <td class="text-right"><span t-esc="line['out_qty']" t-options='{"widget": "float", "precision": 2}'/></td>
-                                    <td class="text-right"><span t-esc="line['saldo_akhir']" t-options='{"widget": "float", "precision": 2}'/></td>
-                                    <td class="text-right"><span t-esc="line['so_fisik']" t-options='{"widget": "float", "precision": 2}'/></td>
-                                    <td class="text-right"><span t-esc="line['selisih']" t-options='{"widget": "float", "precision": 2}'/></td>
-                                    <td class="text-right"><span t-esc="line['harga_beli']" t-options='{"widget": "float", "precision": 2}'/></td>
-                                    <td class="text-right"><span t-esc="line['jumlah_saldo']" t-options='{"widget": "float", "precision": 2}'/></td>
-                                    <td class="text-right"><span t-esc="line['jumlah_selisih']" t-options='{"widget": "float", "precision": 2}'/></td>
+                                    <td>
+                                        <span t-esc="line['name']" />
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-esc="line['satuan']" />
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="line['so_awal']"
+                                            t-options='{"widget": "float", "precision": 2}' />
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="line['in_qty']"
+                                            t-options='{"widget": "float", "precision": 2}' />
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="line['out_qty']"
+                                            t-options='{"widget": "float", "precision": 2}' />
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="line['saldo_akhir']"
+                                            t-options='{"widget": "float", "precision": 2}' />
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="line['so_fisik']"
+                                            t-options='{"widget": "float", "precision": 2}' />
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="line['selisih']"
+                                            t-options='{"widget": "float", "precision": 2}' />
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="line['harga_beli']"
+                                            t-options='{"widget": "float", "precision": 2}' />
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="line['jumlah_so_fisik']"
+                                            t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}' />
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="line['jumlah_saldo']"
+                                            t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}' />
+                                    </td>
+                                    <td class="text-right">
+                                        <span
+                                            t-att-style="'color: red;' if line['jumlah_selisih'] &lt; 0 else ''"
+                                            t-esc="line['jumlah_selisih']"
+                                            t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}' />
+                                    </td>
                                 </tr>
                             </t>
+                            <tr
+                                style="font-weight: bold; background-color: #e0e0e0; font-size: 10px;">
+                                <td colspan="10" class="text-right">GRAND TOTAL:</td>
+                                <td class="text-right">
+                                    <span t-esc="grand_total_fisik"
+                                        t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}' />
+                                </td>
+                                <td class="text-right">
+                                    <span t-esc="grand_total_saldo"
+                                        t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}' />
+                                </td>
+                                <td class="text-right">
+                                    <span t-esc="grand_total_selisih"
+                                        t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}' />
+                                </td>
+                            </tr>
                         </tbody>
+
+
                     </table>
                 </div>
             </t>
         </t>
     </template>
-    
+
     <record id="action_report_stock_by_period" model="ir.actions.report">
         <field name="name">Stock Report by Period</field>
         <field name="model">product.product</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">breeze_distribution.report_stock_by_period_template</field>
         <field name="report_file">breeze_distribution.report_stock_by_period_template</field>
-        <field name="binding_model_id" eval="False"/>
+        <field name="binding_model_id" eval="False" />
         <field name="binding_type">report</field>
     </record>
 </odoo>

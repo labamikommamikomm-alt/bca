@@ -55,49 +55,63 @@
                                 </b>
                             </div>
                         </div>
-                        <div style="margin-top: 1cm font-family: Courier, monospace;">
-
+                        <div style="margin-top: 1cm; font-family: Courier, monospace;">
                             <br />
-                            <h4 class="text-center">Surat Jalan</h4>
+                            <h4 class="text-center">
+                                <t t-set="source_so" t-value="o.sudo().sale_id" />
+                                <t t-set="source_po" t-value="o.sudo().purchase_id" />
+
+                                <t t-if="source_po and source_po.is_peminjaman">
+                                    Peminjaman Barang
+                                </t>
+                                <t t-elif="source_so and source_so.is_pengembalian">
+                                    Pengembalian Barang
+                                </t>
+                                <t t-else="">
+                                    Surat Jalan
+                                </t>
+                            </h4>
                         </div>
 
                         <div name="header" class="row">
                             <div class="col-auto">
                                 <!-- Menggunakan struktur row/col mini untuk penjajaran (alignment) -->
-                                
+
                                 <div class="row" style="margin-left: 0px; margin-right: 0px;">
                                     <div class="col-4" style="padding: 0px;">
                                         <t>No. Surat</t>
                                     </div>
-                                    <div class="col-8" style="padding: 0px;">
-                                        : <span t-field="o.name" />
+                                    <div class="col-8" style="padding: 0px;"> : <span
+                                            t-field="o.name" />
                                     </div>
                                 </div>
-                                <div class="row" style="margin-left: 0px; margin-right: 0px;">
-                                    <div class="col-4" style="padding: 0px;">
-                                        <t>Salesman</t>
+                                <t t-if="not ((source_po and source_po.is_peminjaman) or (source_so and source_so.is_pengembalian))">
+                                    <div class="row" style="margin-left: 0px; margin-right: 0px;">
+                                        <div class="col-4" style="padding: 0px;">
+                                            <t>Salesman</t>
+                                        </div>
+                                        <div class="col-8" style="padding: 0px;"> : <span
+                                                t-field="o.sale_id.team_id.name" />
+                                        </div>
                                     </div>
-                                    <div class="col-8" style="padding: 0px;">
-                                        : <span t-field="o.sale_id.team_id.name" />
-                                    </div>
-                                </div>
-                                
+                                </t>
+
                                 <t t-set="sale_names" t-value="o.sudo().sale_id.name" />
                                 <t t-if="not sale_names and o.origin">
                                     <t t-set="origin_names" t-value="o.sudo().origin.split(', ')" />
                                 </t>
-                                
+
                                 <t t-if="sale_names or origin_names">
                                     <div class="row" style="margin-left: 0px; margin-right: 0px;">
                                         <div class="col-4" style="padding: 0px;">
                                             <t>Order</t>
                                         </div>
-                                        <div class="col-8" style="padding: 0px;">
-                                            : <span t-esc="sale_names or origin_names" />
+                                        <div class="col-8" style="padding: 0px;"> : <span
+                                                t-esc="sale_names or origin_names" />
                                         </div>
                                     </div>
                                 </t>
-                                
+
                             </div>
                             <div class="col-auto text-center">
                                 <t>Tanggal: <span t-field="o.scheduled_date"
@@ -172,26 +186,30 @@
 
                         <div name="footer_signatures" class="row mt-5">
                             <div class="col-auto text-center">
-                                <p>Penerima</p>
+                                <p t-if="(source_po and source_po.is_peminjaman) or (source_so and source_so.is_pengembalian)">Yang Menyerahkan</p>
+                                <p t-else="">Penerima</p>
                                 <br />
                                 <br />
                                 <hr
                                     style="height:1px;border-width:0; color:black; background-color:black;" />
                             </div>
                             <div class="col-auto text-center">
-                                <p>Gudang</p>
+                                <p t-if="(source_po and source_po.is_peminjaman) or (source_so and source_so.is_pengembalian)">Penerima</p>
+                                <p t-else="">Gudang</p>
                                 <br />
                                 <br />
                                 <hr
                                     style="height:1px;border-width:0; color:black; background-color:black;" />
                             </div>
-                            <div class="col-auto text-center">
-                                <p>Penanggung Jawab Teknis</p>
-                                <br />
-                                <br />
-                                <hr
-                                    style="height:1px;border-width:0; color:black; background-color:black;" />
-                            </div>
+                            <t t-if="not ((source_po and source_po.is_peminjaman) or (source_so and source_so.is_pengembalian))">
+                                <div class="col-auto text-center">
+                                    <p>Penanggung Jawab Teknis</p>
+                                    <br />
+                                    <br />
+                                    <hr
+                                        style="height:1px;border-width:0; color:black; background-color:black;" />
+                                </div>
+                            </t>
                         </div>
                     </div>
 

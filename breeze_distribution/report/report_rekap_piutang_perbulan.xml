@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <template id="report_rekap_piutang_perbulan">
+    <t t-call="web.html_container">
+      <t t-set="data_report_margin_top" t-value="5"/>
+      <t t-set="data_report_header_spacing" t-value="50"/>
+      <t t-set="data_report_dpi" t-value="110"/>
+      <t t-call="web.external_layout">
+        <div class="page">
+          <div class="text-center">
+            <h3><span t-esc="company_name"/></h3>
+          </div>
+          <div class="text-center mb-4">
+            <h2>LAPORAN REKAP PIUTANG PERBULAN <span t-esc="year"/></h2>
+          </div>
+          
+          <div name="header" class="row mb-4">
+            <div class="col-12 text-right">
+                <strong>Tanggal Cetak: </strong>
+                <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/>
+            </div>
+          </div>
+
+          <div name="tabel" class="row">
+            <table class="table table-sm table-bordered">
+              <thead class="table-primary">
+                <tr>
+                  <th name="th_bulan" class="text-center" scope="col">BULAN</th>
+                  <th name="th_total" class="text-center" scope="col">TOTAL</th>
+                  <th name="th_terbayar" class="text-center" scope="col">TERBAYAR</th>
+                  <th name="th_sisa" class="text-center" scope="col">SISA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <t t-set="tot_piutang" t-value="0"/>
+                <t t-set="tot_terbayar" t-value="0"/>
+                <t t-set="tot_sisa" t-value="0"/>
+
+                <t t-foreach="lines" t-as="line">
+                  <tr>
+                    <td>
+                      <span t-esc="line['bulan']"/>
+                    </td>
+                    <td class="text-right">
+                      <span t-esc="line['piutang']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                    </td>
+                    <td class="text-right">
+                      <span t-esc="line['terbayar']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                    </td>
+                    <td class="text-right">
+                      <span t-esc="line['sisa']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                    </td>
+                  </tr>
+                  <t t-set="tot_piutang" t-value="tot_piutang + line['piutang']"/>
+                  <t t-set="tot_terbayar" t-value="tot_terbayar + line['terbayar']"/>
+                  <t t-set="tot_sisa" t-value="tot_sisa + line['sisa']"/>
+                </t>
+                
+                <tr>
+                  <th class="text-left">TOTAL</th>
+                  <th class="text-right">
+                    <span t-esc="tot_piutang" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                  </th>
+                  <th class="text-right">
+                    <span t-esc="tot_terbayar" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                  </th>
+                  <th class="text-right">
+                    <span t-esc="tot_sisa" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                  </th>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </t>
+    </t>
+  </template>
+
+  <record id="report_rekap_piutang_perbulan_action" model="ir.actions.report">
+      <field name="name">Laporan Rekap Piutang Perbulan</field>
+      <field name="model">report.rekap_piutang_perbulan</field>
+      <field name="report_type">qweb-pdf</field>
+      <field name="report_name">breeze_distribution.report_rekap_piutang_perbulan</field>
+      <field name="report_file">breeze_distribution.report_rekap_piutang_perbulan</field>
+  </record>
+
+</odoo>

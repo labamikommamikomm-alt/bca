@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError, UserError
 import json
 import base64
@@ -16,7 +16,7 @@ class RekapPembelian(models.TransientModel):
     
     # 1. Tambahkan field boolean baru di sini
     show_invoice_total = fields.Boolean(string="Tampilkan Total per Faktur", default=True, help="Jika dicentang, laporan akan menampilkan subtotal untuk setiap faktur.")
-
+    show_product_info = fields.Boolean(string="Tampilkan Informasi Barang", default=True, help="Jika tidak dicentang, laporan tidak menyertakan informasi Produk (hanya total).")
 
     def _build_comparison_context(self, data):
         result = {}
@@ -27,7 +27,7 @@ class RekapPembelian(models.TransientModel):
 
     def check_report(self):
         data = {}
-        data['form'] = self.read(['start_date', 'end_date', 'supplier', 'show_invoice_total'])[0]
+        data['form'] = self.read(['start_date', 'end_date', 'supplier', 'show_invoice_total', 'show_product_info'])[0]
         
         if not data['form']['start_date'] or not data['form']['end_date']:
             raise ValidationError("Tanggal Mulai dan Tanggal Akhir harus diisi untuk menghasilkan laporan.")
@@ -57,7 +57,7 @@ class RekapPembelian(models.TransientModel):
         
         data = {
             'model': 'report.rekap_pembelian',
-            'form': self.read(['start_date', 'end_date', 'supplier', 'show_invoice_total'])[0]
+            'form': self.read(['start_date', 'end_date', 'supplier', 'show_invoice_total', 'show_product_info'])[0]
         }
         
         # Check date validation again for safety
@@ -69,6 +69,7 @@ class RekapPembelian(models.TransientModel):
         # Fetch report data
         report_data = report_obj._get_report_values(self.ids, data=data)
         lines = report_data['lines']
+        extra_headers = report_data.get('extra_price_headers', [])
         
         # 2. Create the Excel file
         output = io.BytesIO()
@@ -84,14 +85,22 @@ class RekapPembelian(models.TransientModel):
         total_currency_format = workbook.add_format({'bold': True, 'bg_color': '#BFBFBF', 'num_format': '#,##0.00', 'align': 'right', 'border': 1})
 
         # 3. Write Report Header
-        sheet.merge_range('A1:L1', f"LAPORAN DATA PEMBELIAN {report_data['company_name']}", 
-                          workbook.add_format({'bold': True, 'font_size': 14, 'align': 'center'}))
-        sheet.merge_range('A2:L2', f"Periode: {report_data['start_date_formatted']} - {report_data['end_date_formatted']}",
-                          workbook.add_format({'align': 'center', 'italic': True}))
+        total_cols = 13 + len(extra_headers)
+        last_col = total_cols - 1
+        title_format = workbook.add_format({'bold': True, 'font_size': 14, 'align': 'center'})
+        subtitle_format = workbook.add_format({'align': 'center', 'italic': True})
+        sheet.merge_range(0, 0, 0, last_col, f"LAPORAN DATA PEMBELIAN {report_data['company_name']}", title_format)
+        sheet.merge_range(1, 0, 1, last_col, f"Periode: {report_data['start_date_formatted']} - {report_data['end_date_formatted']}", subtitle_format)
         
         # 4. Write Column Headers
-        headers = ['No Dok', 'Tgl Faktur', 'Supplier', 'Faktur', 'Nama Barang', 'Qty', 'Sat', 'Harga', 'Jumlah', 'Sub Total', 'PPN', 'Total']
-        col_widths = [10, 15, 30, 20, 40, 10, 8, 15, 15, 15, 15, 15] 
+        show_prod = data['form']['show_product_info']
+        if show_prod:
+            headers = ['No', 'No Dok', 'Tgl Faktur', 'Supplier', 'Faktur', 'Nama Barang', 'Qty', 'Satuan', 'Harga', 'Jumlah'] + [h.upper() for h in extra_headers] + ['PPN', 'Sub Total', 'Total']
+            col_widths = [5, 10, 15, 30, 20, 40, 10, 8, 15, 15] + [15] * len(extra_headers) + [15, 15, 15]
+        else:
+            headers = ['No', 'No Dok', 'Tgl Faktur', 'Supplier', 'Faktur', 'Sub Total', 'PPN'] + [h.upper() for h in extra_headers] + ['Total']
+            col_widths = [5, 10, 15, 30, 20, 15, 15] + [15] * len(extra_headers) + [15]
+
         row_num = 4
 
         for col_num, header in enumerate(headers):
@@ -100,47 +109,107 @@ class RekapPembelian(models.TransientModel):
             
         row_num += 1
 
-        # 5. Write Data Rows (unchanged logic for merging/data population)
+        # 5. Write Data Rows
+        index = 1
         for line in lines:
             line_products = line['product']
             num_products = len(line_products)
 
-            for i, product in enumerate(line_products):
-                if i == 0:
-                    if num_products > 1:
-                        sheet.merge_range(row_num, 0, row_num + num_products - 1, 0, f"{line['no_dok']}", text_center)
-                        sheet.merge_range(row_num, 1, row_num + num_products - 1, 1, line['tgl_faktur'].strftime('%d/%m/%Y'), text_center)
-                        sheet.merge_range(row_num, 2, row_num + num_products - 1, 2, line['supplier'], text_center)
-                        sheet.merge_range(row_num, 3, row_num + num_products - 1, 3, line['faktur'] or '', text_center)
-                    else:
-                        sheet.write(row_num, 0, f"{line['no_dok']}", text_center)
-                        sheet.write(row_num, 1, line['tgl_faktur'].strftime('%d/%m/%Y'), text_center)
-                        sheet.write(row_num, 2, line['supplier'], text_center)
-                        sheet.write(row_num, 3, line['faktur'] or '', text_center)
+            if not show_prod:
+                # Opsi: ringkasan per faktur (tanpa produk)
+                sheet.write(row_num, 0, index, text_center)
+                sheet.write(row_num, 1, f"{line['no_dok']}", text_center)
+                sheet.write(row_num, 2, line['tgl_faktur'].strftime('%d/%m/%Y'), text_center)
+                sheet.write(row_num, 3, line['supplier'], text_center)
+                sheet.write(row_num, 4, line['faktur'] or '', text_center)
+                
+                sheet.write_number(row_num, 5, line['sub_total'], currency_format)
+                sheet.write_number(row_num, 6, line['ppn'], currency_format)
+                
+                for idx_h, h in enumerate(extra_headers):
+                    col = 7 + idx_h
+                    sheet.write_number(row_num, col, line['extra_costs'].get(h, 0.0), currency_format)
 
-                sheet.write(row_num + i, 4, product['nama_barang'], text_center)
-                sheet.write_number(row_num + i, 5, product['qty'], text_right)
-                sheet.write(row_num + i, 6, product['sat'], text_center)
-                sheet.write_number(row_num + i, 7, product['harga'], currency_format)
-                sheet.write_number(row_num + i, 8, product['jumlah'], currency_format)
+                col_total = 7 + len(extra_headers)
+                sheet.write_number(row_num, col_total, line['total'], currency_format)
 
-                if i == 0:
-                    if num_products > 1:
-                        sheet.merge_range(row_num, 9, row_num + num_products - 1, 9, line['sub_total'], currency_format)
-                        sheet.merge_range(row_num, 10, row_num + num_products - 1, 10, line['ppn'], currency_format)
-                        sheet.merge_range(row_num, 11, row_num + num_products - 1, 11, line['total'], currency_format)
-                    else:
-                        sheet.write_number(row_num + i, 9, line['sub_total'], currency_format)
-                        sheet.write_number(row_num + i, 10, line['ppn'], currency_format)
-                        sheet.write_number(row_num + i, 11, line['total'], currency_format)
-            
-            row_num += num_products
+                row_num += 1
+                index += 1
+            else:
+                for i, product in enumerate(line_products):
+                    if i == 0:
+                        if num_products > 1:
+                            sheet.merge_range(row_num, 0, row_num + num_products - 1, 0, index, text_center)
+                            sheet.merge_range(row_num, 1, row_num + num_products - 1, 1, f"{line['no_dok']}", text_center)
+                            sheet.merge_range(row_num, 2, row_num + num_products - 1, 2, line['tgl_faktur'].strftime('%d/%m/%Y'), text_center)
+                            sheet.merge_range(row_num, 3, row_num + num_products - 1, 3, line['supplier'], text_center)
+                            sheet.merge_range(row_num, 4, row_num + num_products - 1, 4, line['faktur'] or '', text_center)
+                        else:
+                            sheet.write(row_num, 0, index, text_center)
+                            sheet.write(row_num, 1, f"{line['no_dok']}", text_center)
+                            sheet.write(row_num, 2, line['tgl_faktur'].strftime('%d/%m/%Y'), text_center)
+                            sheet.write(row_num, 3, line['supplier'], text_center)
+                            sheet.write(row_num, 4, line['faktur'] or '', text_center)
+
+                    sheet.write(row_num + i, 5, product['nama_barang'], text_center)
+                    sheet.write_number(row_num + i, 6, product['qty'], text_right)
+                    sheet.write(row_num + i, 7, product['sat'], text_center)
+                    sheet.write_number(row_num + i, 8, product['harga'], currency_format)
+                    sheet.write_number(row_num + i, 9, product['jumlah'], currency_format)
+
+                    if i == 0:
+                        if num_products > 1:
+                            for idx_h, h in enumerate(extra_headers):
+                                col = 10 + idx_h
+                                val = line['extra_costs'].get(h, 0.0)
+                                sheet.merge_range(row_num, col, row_num + num_products - 1, col, val, currency_format)
+                            
+                            col_ppn = 10 + len(extra_headers)
+                            sheet.merge_range(row_num, col_ppn, row_num + num_products - 1, col_ppn, line['ppn'], currency_format)
+                            sheet.merge_range(row_num, col_ppn + 1, row_num + num_products - 1, col_ppn + 1, line['sub_total'], currency_format)
+                            sheet.merge_range(row_num, col_ppn + 2, row_num + num_products - 1, col_ppn + 2, line['total'], currency_format)
+                            
+                        else:
+                            for idx_h, h in enumerate(extra_headers):
+                                col = 10 + idx_h
+                                sheet.write_number(row_num + i, col, line['extra_costs'].get(h, 0.0), currency_format)
+                            
+                            col_ppn = 10 + len(extra_headers)
+                            sheet.write_number(row_num + i, col_ppn, line['ppn'], currency_format)
+                            sheet.write_number(row_num + i, col_ppn + 1, line['sub_total'], currency_format)
+                            sheet.write_number(row_num + i, col_ppn + 2, line['total'], currency_format)
+                
+                row_num += num_products
+                index += 1
             
         # 6. Write Grand Total
-        sheet.merge_range(row_num, 0, row_num, 8, 'TOTAL:', total_format)
-        sheet.write_number(row_num, 9, report_data['grand_sub_total'], total_currency_format)
-        sheet.write_number(row_num, 10, report_data['grand_ppn'], total_currency_format)
-        sheet.write_number(row_num, 11, report_data['grand_total_amount'], total_currency_format)
+        if show_prod:
+            sheet.merge_range(row_num, 0, row_num, 9, 'TOTAL:', total_format)
+            col_offset = 10
+            
+            grand_extra_totals = report_data.get('grand_extra_totals', {})
+            for idx_h, h in enumerate(extra_headers):
+                col = col_offset + idx_h
+                sheet.write_number(row_num, col, grand_extra_totals.get(h, 0.0), total_currency_format)
+                
+            col_ppn = col_offset + len(extra_headers)
+            sheet.write_number(row_num, col_ppn, report_data['grand_ppn'], total_currency_format)
+            sheet.write_number(row_num, col_ppn + 1, report_data['grand_sub_total'], total_currency_format)
+            sheet.write_number(row_num, col_ppn + 2, report_data['grand_total_amount'], total_currency_format)
+        else:
+            sheet.merge_range(row_num, 0, row_num, 4, 'TOTAL:', total_format)
+            col_offset = 5
+            
+            sheet.write_number(row_num, col_offset, report_data['grand_sub_total'], total_currency_format)
+            sheet.write_number(row_num, col_offset + 1, report_data['grand_ppn'], total_currency_format)
+            
+            grand_extra_totals = report_data.get('grand_extra_totals', {})
+            for idx_h, h in enumerate(extra_headers):
+                col = col_offset + 2 + idx_h
+                sheet.write_number(row_num, col, grand_extra_totals.get(h, 0.0), total_currency_format)
+            
+            col_total = col_offset + 2 + len(extra_headers)
+            sheet.write_number(row_num, col_total, report_data['grand_total_amount'], total_currency_format)
 
         # Finalize
         workbook.close()

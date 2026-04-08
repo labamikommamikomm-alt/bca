@@ -20,3 +20,4 @@ from . import inherit_purchase_report
 from . import inherit_sale_report
 from . import inherit_res_company
 from . import inherit_supplier_info
+from . import account_move_inherit

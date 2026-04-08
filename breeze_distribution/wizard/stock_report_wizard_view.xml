@@ -8,10 +8,15 @@
                     <group>
                         <field name="start_date"/>
                         <field name="end_date"/>
+                        <field name="excel_filename" invisible="1"/>
+                        <field name="excel_file" invisible="1"/>
                     </group>
                 </sheet>
                 <footer>
-                    <button name="print_stock_report" string="Print Report" type="object" class="btn-primary"/>
+                    <button name="print_stock_report" string="Print PDF" type="object" class="btn-primary" icon="fa-print"/>
+                    
+                    <button name="action_print_excel" string="Download Excel" type="object" class="btn-success" icon="fa-file-excel-o" style="margin-left: 10px;"/>
+                    
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>

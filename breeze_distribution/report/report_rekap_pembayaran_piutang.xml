@@ -6,16 +6,40 @@
       <t t-set="data_report_margin_top" t-value="5"/>
       <t t-set="data_report_header_spacing" t-value="50"/>
       <t t-set="data_report_dpi" t-value="110"/>
-      <t t-call="web.internal_layout">
+      <t t-call="web.external_layout">
         <div class="page">
           <div class="text-center">
             <h3><span t-esc="company_name"/></h3>
           </div>
-          <div class="text-center">
+          <div class="text-center mb-4">
             <h2>LAPORAN PEMBAYARAN PIUTANG</h2>
           </div>
-          <div name="tanggal">
-            <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/>
+          <div class="row mb-4">
+            <div class="col-6">
+                <strong>Periode Invoice: </strong>
+                <t t-if="data.get('date_from')"><span t-esc="data['date_from']"/></t>
+                <t t-else="">-</t>
+                s/d
+                <t t-if="data.get('date_to')"><span t-esc="data['date_to']"/></t>
+                <t t-else="">-</t>
+                <br/>
+                <strong>Periode Pembayaran: </strong>
+                <t t-if="data.get('payment_date_from')"><span t-esc="data['payment_date_from']"/></t>
+                <t t-else="">-</t>
+                s/d
+                <t t-if="data.get('payment_date_to')"><span t-esc="data['payment_date_to']"/></t>
+                <t t-else="">-</t>
+                <br/>
+                <strong>Kolektor / Sales: </strong>
+                <span t-esc="data.get('user_name', 'Semua')"/>
+                  <br/>
+                <strong>Bank / Kas: </strong>
+                <span t-esc="data.get('journal_name', 'Semua')"/>
+            </div>
+            <div class="col-6 text-right">
+                <strong>Tanggal Cetak: </strong>
+                <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/>
+            </div>
           </div>
           <div name="tabel" class="row">
             <table class="table table-sm table-bordered">

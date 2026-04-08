@@ -20,5 +20,9 @@ access_stock_report_wizard,Stock Report Wizard Access,model_stock_report_wizard,
 access_balance_sheet_t_wizard,Balance Sheet T Wizard,model_balance_sheet_t_wizard,base.group_user,1,1,1,1
 access_profit_loss_wizard,Profit Loss Wizard,model_profit_loss_wizard,base.group_user,1,1,1,1
 access_general_ledger_wizard,Buku Besar Wizard,model_general_ledger_wizard,base.group_user,1,1,1,1
-
+access_wizard_export_vendor_bill,Wizard Export Vendor Bill,model_wizard_export_vendor_bill,base.group_user,1,1,1,1
 access_product_last_price_customer,product.last.price.customer,model_product_last_price_customer,base.group_user,1,1,1,1
+access_general_ledger_report_line,general.ledger.report.line,model_general_ledger_report_line,base.group_user,1,1,1,1
+access_report_rekap_piutang_perbulan,report.rekap_piutang_perbulan,model_report_rekap_piutang_perbulan,base.group_user,1,1,1,1
+access_report_rekap_piutang_persales,report.rekap_piutang_persales,model_report_rekap_piutang_persales,base.group_user,1,1,1,1
+access_export_invoice_recap_wizard,export.invoice.recap.wizard,model_export_invoice_recap_wizard,base.group_user,1,1,1,1

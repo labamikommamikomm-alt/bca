@@ -3,12 +3,12 @@
   <data>
     <template id="inherit_delivery_slip_document" inherit_id="stock.report_delivery_document">
       <xpath expr="//div[@class='page']" position="before">
-          <style>
+        <style>
               body {
                   font-size: 9px;
               }
-          </style>
-          </xpath>
+        </style>
+      </xpath>
       <!-- <xpath expr="//t[@name='partner_header']" position="before">
         <div name="company" class="row">
           <div class="col-auto col-9">
@@ -141,6 +141,35 @@
             <hr style="height:1px;border-width:0; color:black; background-color:black;" />
           </div>
         </div>
+      </xpath>
+      <xpath expr="//table[@name='stock_move_table']" position="replace">
+        <!-- <table class="table table-sm" t-if="o.state!='done'" name="stock_move_table">
+          <thead>
+            <tr>
+              <th name="th_sm_product">
+                <strong>Product</strong>
+              </th>
+              <th name="th_sm_quantity">
+                <strong>Quantity</strong>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <t t-set="lines" t-value="o.move_lines.filtered(lambda x: x.product_uom_qty)"/>
+            <tr t-foreach="lines" t-as="move">
+              <td>
+                <span t-field="move.product_id"/>
+                <p t-if="move.description_picking != move.product_id.name">
+                  <span t-field="move.description_picking"/>
+                </p>
+              </td>
+              <td>
+                <span t-esc="'%.0f'%move.product_uom_qty"/>
+                <span t-field="move.product_uom"/>
+              </td>
+            </tr>
+          </tbody>
+        </table> -->
       </xpath>
     </template>
   </data>

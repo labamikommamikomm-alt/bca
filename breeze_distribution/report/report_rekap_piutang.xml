@@ -6,7 +6,7 @@
       <t t-set="data_report_margin_top" t-value="5"/>
       <t t-set="data_report_header_spacing" t-value="50"/>
       <t t-set="data_report_dpi" t-value="110"/>
-      <t t-call="web.internal_layout">
+      <t t-call="web.external_layout">
         <div class="page">
           <div class="text-center">
             <h3>
@@ -16,22 +16,34 @@
           <div class="text-center">
             <h2>LAPORAN REKAP PIUTANG</h2>
           </div>
-          <div name="header" class="row">
-            <!-- <t t-foreach='docs' t-as="o"> -->
-            <div class="col-auto">
-              <p>Tanggal : <span t-esc="data['date_from']" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
-
-              <span t-esc="data['date_to']" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
-            </p>
-          </div>
-          <div class="col-auto">
-          </div>
-          <div class="col-auto">
-            <p>
-              <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/>
-            </p>
-          </div>
-          <!-- </t> -->
+          <div name="header" class="row mb-4">
+            <div class="col-6">
+                <strong>Periode: </strong>
+                <t t-if="data.get('date_from')"><span t-esc="data['date_from']"/></t>
+                <t t-else="">-</t>
+                s/d
+                <t t-if="data.get('date_to')"><span t-esc="data['date_to']"/></t>
+                <t t-else="">-</t>
+                <br/>
+                <strong>Customer: </strong>
+                <t t-if="data.get('partner_id')"><span t-esc="data['partner_id'][1] if isinstance(data['partner_id'], list) else data['partner_id']"/></t>
+                <t t-else="">Semua</t>
+                <br/>
+                <strong>Sales / Kolektor: </strong>
+                <t t-if="data.get('user_id')"><span t-esc="data['user_id'][1] if isinstance(data['user_id'], list) else data['user_id']"/></t>
+                <t t-else="">Semua</t>
+                <br/>
+                <strong>Status Pembayaran: </strong>
+                <t t-if="data.get('payment_state') == 'not_paid'">Not Paid</t>
+                <t t-elif="data.get('payment_state') == 'paid'">Paid</t>
+                <t t-elif="data.get('payment_state') == 'partial'">Partially Paid</t>
+                <t t-elif="data.get('payment_state') == 'in_payment'">In Payment</t>
+                <t t-else="">Semua (All)</t>
+            </div>
+            <div class="col-6 text-right">
+                <strong>Tanggal Cetak: </strong>
+                <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/>
+            </div>
         </div>
         <div name="tabel" class="row">
           <table class="table table-sm table-bordered">

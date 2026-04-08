@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_general_ledger_report_line_tree" model="ir.ui.view">
+            <field name="name">general.ledger.report.line.tree</field>
+            <field name="model">general.ledger.report.line</field>
+            <field name="arch" type="xml">
+                <tree string="Buku Besar" create="0" edit="0" delete="0">
+                    <field name="account_id" optional="hide"/>
+                    <field name="date"/>
+                    <field name="journal_id" optional="show"/>
+                    <field name="ref"/>
+                    <field name="name"/>
+                    <field name="debit" sum="Total Debit"/>
+                    <field name="credit" sum="Total Kredit"/>
+                    <field name="cumulated_balance" string="Saldo"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_general_ledger_report_line_search" model="ir.ui.view">
+            <field name="name">general.ledger.report.line.search</field>
+            <field name="model">general.ledger.report.line</field>
+            <field name="arch" type="xml">
+                <search string="Cari Buku Besar">
+                    <field name="account_id"/>
+                    <field name="date"/>
+                    <field name="name"/>
+                    <field name="ref"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Nomor Akun" name="group_by_account" context="{'group_by':'account_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+    </data>
+</odoo>
