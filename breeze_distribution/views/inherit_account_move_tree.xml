@@ -20,6 +20,14 @@
             <xpath expr="//field[@name='invoice_date']" position="after">
                 <field name="invoice_user_id" optional="show" widget="many2one_avatar_user" string="Sales"/>
             </xpath>
+            <xpath expr="//field[@name='payment_state']" position="after">
+                <field name="payment_date_display" optional="hide" string="Tgl Terbayar"/>
+                <field name="payment_method_display" optional="hide" string="Metode Pembayaran"/>
+                <field name="total_ppn" optional="hide" string="PPN"/>
+                <field name="total_pph" optional="hide" string="PPh"/>
+                <field name="total_admin" optional="hide" string="Biaya Admin"/>
+                <field name="total_potongan" optional="hide" string="Potongan Penjualan"/>
+            </xpath>
         </field>
     </record>
 </odoo>

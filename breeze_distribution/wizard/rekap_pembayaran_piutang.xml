@@ -10,7 +10,7 @@
                     <group string="Filter Invoice">
                         <field name="date_from"/>
                         <field name="date_to"/>
-                        <field name="user_id"/>
+                        <field name="team_id"/>
                     </group>
                     <group string="Filter Pembayaran">
                         <field name="payment_date_from"/>

@@ -119,6 +119,39 @@ class InheritAccountMove(models.Model):
     tanggal_faktur = fields.Date(string="Tanggal Faktur")
     show_product = fields.Text(string="Show Product")
 
+    # Grouped Tax Totals for Reports and Views
+    total_ppn = fields.Monetary(string="PPN", compute="_compute_gtax_totals")
+    total_pph = fields.Monetary(string="PPh", compute="_compute_gtax_totals")
+    total_admin = fields.Monetary(string="Admin", compute="_compute_gtax_totals")
+    total_potongan = fields.Monetary(string="Potongan", compute="_compute_gtax_totals")
+    
+    payment_method_display = fields.Char(string="Metode Pembayaran", compute="_compute_payment_info")
+    payment_date_display = fields.Char(string="Tgl Terbayar", compute="_compute_payment_info")
+
+    def _compute_gtax_totals(self):
+        for move in self:
+            move.total_ppn = sum(move.global_tax_ids.filtered(lambda t: t.global_tax_id.name == 'PPN Keluaran').mapped('amount'))
+            move.total_pph = sum(move.global_tax_ids.filtered(lambda t: t.global_tax_id.name == 'PPh 22').mapped('amount'))
+            move.total_admin = sum(move.global_tax_ids.filtered(lambda t: t.global_tax_id.name == 'Biaya Administrasi Umum').mapped('amount'))
+            move.total_potongan = sum(move.global_tax_ids.filtered(lambda t: t.global_tax_id.name == 'Potongan Penjualan Global').mapped('amount'))
+
+    def _compute_payment_info(self):
+        for move in self:
+            # Reconciled lines are those reconciled with relevant account lines of the move
+            account_type = 'receivable' if move.move_type in ('out_invoice', 'out_refund') else 'payable'
+            pay_lines = move.line_ids.filtered(lambda l: l.account_id.user_type_id.type == account_type)
+            reconciled_moves = pay_lines.mapped('matched_debit_ids.debit_move_id.move_id') | \
+                               pay_lines.mapped('matched_credit_ids.credit_move_id.move_id')
+            
+            # Filter for cash/bank journals
+            valid_payments = reconciled_moves.filtered(lambda m: m.journal_id.type in ('bank', 'cash'))
+            
+            methods = valid_payments.mapped('journal_id.name')
+            dates = valid_payments.mapped(lambda p: p.date.strftime("%d/%m/%Y") if p.date else "")
+            
+            move.payment_method_display = ", ".join(list(set(methods)))
+            move.payment_date_display = ", ".join(list(set(filter(None, dates))))
+
     def _csv_row(self, data, delimiter=",", quote='"'):
         stringList = []
 
@@ -198,41 +231,24 @@ class InheritAccountMove(models.Model):
         return so.name
 
     def jenis_pembayaran(self):
-        jenis = []
-        journal = (
-            self.env["account.move"]
-            .sudo()
-            .search(
-                [
-                    ("ref", "=", self.name),
-                    "|",
-                    ("journal_id.type", "=", "cash"),
-                    ("journal_id.type", "=", "bank"),
-                ]
-            )
-        )
-        for rec in journal:
-            jenis.append(rec.journal_id.name)
-        return "".join(jenis)
+        account_type = 'receivable' if self.move_type in ('out_invoice', 'out_refund') else 'payable'
+        pay_lines = self.line_ids.filtered(lambda l: l.account_id.user_type_id.type == account_type)
+        reconciled_moves = pay_lines.mapped('matched_debit_ids.debit_move_id.move_id') | \
+                           pay_lines.mapped('matched_credit_ids.credit_move_id.move_id')
+        
+        valid_payments = reconciled_moves.filtered(lambda m: m.journal_id.type in ('bank', 'cash'))
+        jenis = valid_payments.mapped('journal_id.name')
+        return ", ".join(list(set(jenis)))
 
     def tanggal_bayar(self):
-        tanggal = []
-        journal = (
-            self.env["account.move"]
-            .sudo()
-            .search(
-                [
-                    ("ref", "=", self.name),
-                    "|",
-                    ("journal_id.type", "=", "cash"),
-                    ("journal_id.type", "=", "bank"),
-                ]
-            )
-        )
-
-        for rec in journal:
-            tanggal.append(rec.date.strftime("%d/%m/%Y"))
-        return "".join(tanggal)
+        account_type = 'receivable' if self.move_type in ('out_invoice', 'out_refund') else 'payable'
+        pay_lines = self.line_ids.filtered(lambda l: l.account_id.user_type_id.type == account_type)
+        reconciled_moves = pay_lines.mapped('matched_debit_ids.debit_move_id.move_id') | \
+                           pay_lines.mapped('matched_credit_ids.credit_move_id.move_id')
+        
+        valid_payments = reconciled_moves.filtered(lambda m: m.journal_id.type in ('bank', 'cash'))
+        tanggal = valid_payments.mapped(lambda p: p.date.strftime("%d/%m/%Y") if p.date else "")
+        return ", ".join(list(set(filter(None, tanggal))))
 
     def total_bayar(self):
         for i in self:
@@ -299,7 +315,7 @@ class InheritAccountMove(models.Model):
                     two_digit_year = str(invoice_year)[-2:]
 
                     # Dynamic Branch Prefix: Get from Company Settings or default
-                    # Original code hardcoded 'P'. This should ideally be a config.
+                    # Original code hardcoded 'A'. This should ideally be a config.
                     branch_prefix = "P"  # TODO: Make this a setting on res.company
 
                     # Clean Tax Number and get last 8 digits

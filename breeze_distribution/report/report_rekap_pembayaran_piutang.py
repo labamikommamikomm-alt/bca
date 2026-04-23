@@ -15,7 +15,7 @@ class ReportRekapPembayaranPiutang(models.AbstractModel):
         date_to = form.get('date_to')
         payment_date_from = form.get('payment_date_from')
         payment_date_to = form.get('payment_date_to')
-        user_id = form.get('user_id')
+        team_id = form.get('team_id')
         journal_id = form.get('journal_id')
 
         # Find relevant payments based on filters
@@ -45,29 +45,35 @@ class ReportRekapPembayaranPiutang(models.AbstractModel):
             invoices = invoices.filtered(lambda i: i.invoice_date and i.invoice_date >= fields.Date.from_string(date_from))
         if date_to:
             invoices = invoices.filtered(lambda i: i.invoice_date and i.invoice_date <= fields.Date.from_string(date_to))
-        if user_id:
-            invoices = invoices.filtered(lambda i: i.invoice_user_id.id == user_id)
+        if team_id:
+            invoices = invoices.filtered(lambda i: i.team_id.id == team_id)
 
         # Structure data grouping by salesperson / kolektor (using 'penagih' in the template)
         grouped_data = {}
         company = self.env.company
         currency_id = company.currency_id
 
+        # Collect dynamic global tax names first
+        dynamic_tax_names = set()
         for inv in invoices:
-            penagih_name = inv.invoice_user_id.name or 'Unknown'
+            for t in inv.global_tax_ids:
+                if t.global_tax_id.name:
+                    dynamic_tax_names.add(t.global_tax_id.name)
+        dynamic_tax_names = sorted(list(dynamic_tax_names))
+
+        for inv in invoices:
+            penagih_name = inv.team_id.name or 'Unknown'
             if penagih_name not in grouped_data:
                 grouped_data[penagih_name] = {
                     'penagih': penagih_name,
                     'lines': [],
-                    'total_admin': 0.0,
                     'total_saldo': 0.0,
-                    'total_ppn': 0.0,
-                    'total_pph': 0.0,
                     'total_bayar': 0.0,
+                    'total_taxes': {tax: 0.0 for tax in dynamic_tax_names},
                 }
             
             # Find specific payments for this invoice
-            inv_reconciled_lines = inv.line_ids.filtered(lambda l: l.account_id.internal_type == 'receivable')
+            inv_reconciled_lines = inv.line_ids.filtered(lambda l: l.account_id.user_type_id.type == 'receivable')
             # payments for this invoice
             inv_payments = inv_reconciled_lines.mapped('matched_credit_ids.credit_move_id.payment_id') | \
                            inv_reconciled_lines.mapped('matched_debit_ids.debit_move_id.payment_id')
@@ -82,28 +88,47 @@ class ReportRekapPembayaranPiutang(models.AbstractModel):
             tgl_lunas = valid_payments.mapped('date')
             jenis = valid_payments.mapped('journal_id.name')
 
+            # Process Global Taxes
+            global_taxes = inv.global_tax_ids
+            # Leave PPN separately only for saldo calculation if we desire (saldo = total + PPN)
+            ppn_val = sum(global_taxes.filtered(lambda t: t.global_tax_id.name and 'PPN' in t.global_tax_id.name.upper()).mapped('amount'))
+            
+            # Saldo = total + ppn
+            saldo_val = inv.amount_total + ppn_val
+
+            line_taxes = {tax: 0.0 for tax in dynamic_tax_names}
+            for t in global_taxes:
+                if t.global_tax_id.name:
+                    line_taxes[t.global_tax_id.name] += t.amount
+
             line_data = {
                 'faktur': inv.name,
                 'tanggal': inv.invoice_date,
                 'customer': inv.partner_id.name,
-                'sales': inv.invoice_user_id.name,
+                'sales': inv.team_id.name,
                 'tgl_lunas': tgl_lunas,
-                'keterangan': inv.payment_state,
+                'keterangan': ', '.join(jenis) if jenis else '',
                 'jenis': jenis,
-                'taxes': [], # To be calculated if needed, placeholder for now
-                'saldo': inv.amount_total,
-                'ppn': inv.amount_tax,
+                'saldo': saldo_val,
+                'taxes': line_taxes,
                 'bayar': bayar_amount,
             }
 
             grouped_data[penagih_name]['lines'].append(line_data)
-            grouped_data[penagih_name]['total_saldo'] += inv.amount_total
-            grouped_data[penagih_name]['total_ppn'] += inv.amount_tax
+            grouped_data[penagih_name]['total_saldo'] += saldo_val
             grouped_data[penagih_name]['total_bayar'] += bayar_amount
+            for tax in dynamic_tax_names:
+                grouped_data[penagih_name]['total_taxes'][tax] += line_taxes[tax]
 
         lines_result = list(grouped_data.values())
-        if user_id:
-            form['user_name'] = self.env['res.users'].browse(user_id).name
+        
+        # Calculate Grand Totals
+        grand_total_saldo = sum(x['total_saldo'] for x in lines_result)
+        grand_total_bayar = sum(x['total_bayar'] for x in lines_result)
+        grand_total_taxes = {tax: sum(x['total_taxes'][tax] for x in lines_result) for tax in dynamic_tax_names}
+
+        if team_id:
+            form['team_name'] = self.env['crm.team'].browse(team_id).name
         if journal_id:
             form['journal_name'] = self.env['account.journal'].browse(journal_id).name
 
@@ -114,4 +139,8 @@ class ReportRekapPembayaranPiutang(models.AbstractModel):
             'lines': lines_result,
             'company_name': company.name,
             'currency_id': currency_id,
+            'grand_total_saldo': grand_total_saldo,
+            'grand_total_taxes': grand_total_taxes,
+            'grand_total_bayar': grand_total_bayar,
+            'dynamic_tax_names': dynamic_tax_names,
         }

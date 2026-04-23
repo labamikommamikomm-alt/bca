@@ -13,7 +13,7 @@ class RekapPiutang(models.TransientModel):
 
     date_from = fields.Date(string="Starting Date")
     date_to = fields.Date(string="Ending Date")
-    user_id = fields.Many2one('res.users', string="Sales / Kolektor")
+    team_id = fields.Many2one('crm.team', string="Sales Team / Kolektor")
     partner_id = fields.Many2one('res.partner', string="Customer")
     payment_state = fields.Selection([
         ('not_paid', 'Not Paid'),
@@ -31,10 +31,10 @@ class RekapPiutang(models.TransientModel):
 
     def check_report(self):
         data = {}
-        data['form'] = self.read(['date_from', 'date_to', 'user_id', 'partner_id', 'payment_state'])[0]
+        data['form'] = self.read(['date_from', 'date_to', 'team_id', 'partner_id', 'payment_state'])[0]
         
-        if data['form']['user_id']:
-            data['form']['user_id'] = data['form']['user_id'][0]
+        if data['form']['team_id']:
+            data['form']['team_id'] = data['form']['team_id'][0]
         if data['form']['partner_id']:
             data['form']['partner_id'] = data['form']['partner_id'][0]
             
@@ -44,9 +44,9 @@ class RekapPiutang(models.TransientModel):
 
     def export_excel(self):
         data = {}
-        data['form'] = self.read(['date_from', 'date_to', 'user_id', 'partner_id', 'payment_state'])[0]
-        if data['form']['user_id']:
-            data['form']['user_id'] = data['form']['user_id'][0]
+        data['form'] = self.read(['date_from', 'date_to', 'team_id', 'partner_id', 'payment_state'])[0]
+        if data['form']['team_id']:
+            data['form']['team_id'] = data['form']['team_id'][0]
         if data['form']['partner_id']:
             data['form']['partner_id'] = data['form']['partner_id'][0]
 
@@ -68,17 +68,21 @@ class RekapPiutang(models.TransientModel):
 
         sheet.write('A3', 'Tipe Filter', workbook.add_format({'bold': True}))
         sheet.write('A4', f"Tanggal: {data['form']['date_from'] or '-'} to {data['form']['date_to'] or '-'}")
+        team_name = report_values.get('data', {}).get('team_name', 'Semua')
+        partner_name = report_values.get('data', {}).get('partner_name', 'Semua')
+        sheet.write('A5', f"Sales Team / Kolektor: {team_name}")
+        sheet.write('A6', f"Customer: {partner_name}")
         
         headers = ['No', 'Tanggal Jual', 'Nota Penjualan', 'Customer', 'Piutang', 'Terbayar', 'Sisa Piutang', 'Sales', 'Kota', 'Keterangan']
         for col, h in enumerate(headers):
-            sheet.write(6, col, h, header_format)
+            sheet.write(7, col, h, header_format)
             
         sheet.set_column('B:C', 15)
         sheet.set_column('D:D', 25)
         sheet.set_column('E:G', 15)
         sheet.set_column('H:J', 20)
 
-        row = 7
+        row = 8
         idx = 1
         for line in lines:
             sheet.write(row, 0, idx, text_center)

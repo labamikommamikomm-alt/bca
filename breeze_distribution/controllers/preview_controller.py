@@ -13,19 +13,26 @@ class RekapPenjualanController(http.Controller):
             return fields.Datetime.context_timestamp(request.env.user, datetime_obj)
         
         # Get customer
-        customer = request.env["res.partner"].sudo().search([("id","=", id)], limit=1)
-        if not customer:
-            raise exceptions.UserError(_("Customer not found."))
+        if id != 0:
+            customer = request.env["res.partner"].sudo().search([("id","=", id)], limit=1)
+            if not customer:
+                raise exceptions.UserError(_("Customer not found."))
+            customerArray = [customer.id, customer.name]
+        else:
+            customer = False
+            customerArray = [0, "Semua Pembeli"]
         
-        customerArray = [customer.id, customer.name]
         
         # Get invoices for the specific customer and journal type 'sale'
-        invoices = request.env['account.move'].sudo().search([
+        domain = [
             ('journal_id.type', '=', 'sale'), 
-            ('partner_id', '=', customer.id),
             ('state', '=', 'posted'),
             ('move_type', '=', 'out_invoice'), 
-        ])
+        ]
+        if customer:
+            domain.append(('partner_id', '=', customer.id))
+            
+        invoices = request.env['account.move'].sudo().search(domain)
         
         company = request.env.user.company_id
         company_name = company.name
@@ -175,6 +182,7 @@ class RekapPenjualanController(http.Controller):
             'tp': total_ppn,  
             'total': total,   
             'currency_id': currency_id,
+            'header_color': request.env['report.breeze_distribution.report_rekap_penjualan'].HEADER_COLOR,
         }
         
         return request.render('breeze_distribution.report_rekap_penjualan', data)

@@ -6,6 +6,9 @@
                 <div class="page" style="font-size: 11px;">
                     <div class="text-center mb-4">
                         <h2>Rekap Pembayaran Hutang</h2>
+                        <t t-if="date_from and date_to">
+                            <p>Periode: <span t-esc="date_from" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/> s/d <span t-esc="date_to" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/></p>
+                        </t>
                     </div>
 
                     <table class="table table-sm table-bordered">
@@ -53,10 +56,10 @@
                                         <span t-field="o.l10n_id_tax_number"/>
                                     </td>
                                     <td t-if="data.get('show_untaxed_amount')" class="text-right">
-                                        <span t-field="o.amount_untaxed_signed" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                                        <span t-esc="abs(o.amount_untaxed_signed)" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
                                     </td>
                                     <td t-if="data.get('show_total')" class="text-right">
-                                        <span t-field="o.amount_total_signed" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
+                                        <span t-esc="abs(o.amount_total_signed)" t-options='{"widget": "monetary", "display_currency": o.company_currency_id}'/>
                                     </td>
                                     <td t-if="data.get('show_last_payment_date')" class="text-center">
                                         <span t-field="o.last_payment_date" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/>
@@ -75,7 +78,7 @@
                                 </tr>
                                 <t t-set="num" t-value="num + 1"/>
                                 <t t-if="data.get('show_grand_total')">
-                                    <t t-set="cumulative_grand_total" t-value="cumulative_grand_total + o.amount_total"/>
+                                    <t t-set="cumulative_grand_total" t-value="cumulative_grand_total + abs(o.amount_total_signed)"/>
                                 </t>
                             </t>
                             

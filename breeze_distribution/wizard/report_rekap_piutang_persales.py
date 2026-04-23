@@ -29,19 +29,19 @@ class RekapPiutangPersales(models.TransientModel):
     
     tahun_selection = fields.Selection(selection='_get_years', string="Tahun")
     
-    sales_id = fields.Many2one('res.users', string="Sales / Kolektor")
+    team_id = fields.Many2one('crm.team', string="Sales Team / Kolektor")
 
     def check_report(self):
-        data = {'form': self.read(['judul', 'date_from', 'date_to', 'bulan_selection', 'tahun_selection', 'sales_id'])[0]}
-        if data['form']['sales_id']:
-            data['form']['sales_id'] = data['form']['sales_id'][0]
+        data = {'form': self.read(['judul', 'date_from', 'date_to', 'bulan_selection', 'tahun_selection', 'team_id'])[0]}
+        if data['form']['team_id']:
+            data['form']['team_id'] = data['form']['team_id'][0]
             
         return self.env.ref('breeze_distribution.report_rekap_piutang_persales_action').report_action(self, data=data)
 
     def export_excel(self):
-        data = {'form': self.read(['judul', 'date_from', 'date_to', 'bulan_selection', 'tahun_selection', 'sales_id'])[0]}
-        if data['form']['sales_id']:
-            data['form']['sales_id'] = data['form']['sales_id'][0]
+        data = {'form': self.read(['judul', 'date_from', 'date_to', 'bulan_selection', 'tahun_selection', 'team_id'])[0]}
+        if data['form']['team_id']:
+            data['form']['team_id'] = data['form']['team_id'][0]
             
         report_model = self.env['report.breeze_distribution.report_rekap_piutang_persales']
         report_values = report_model._get_report_values(self.ids, data=data)
@@ -68,8 +68,8 @@ class RekapPiutangPersales(models.TransientModel):
         sheet.write('B4', str(data['form']['date_to'] or '-'))
         sheet.write('A5', 'Periode Bulan/Tahun:', filter_bold)
         sheet.write('B5', f"{dict(self._fields['bulan_selection'].selection).get(data['form']['bulan_selection'], '-')} / {data['form']['tahun_selection'] or '-'}")
-        sheet.write('A6', 'Sales:', filter_bold)
-        sheet.write('B6', self.sales_id.name if self.sales_id else 'Semua Sales')
+        sheet.write('A6', 'Sales Team:', filter_bold)
+        sheet.write('B6', self.team_id.name if self.team_id else 'Semua Sales Team')
 
         headers = ['No', 'Tanggal Faktur', 'No Faktur', 'Customer', 'Piutang', 'Terbayar', 'Sisa']
         for col, h in enumerate(headers):

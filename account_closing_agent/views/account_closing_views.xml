@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_year_end_closing_tree" model="ir.ui.view">
+        <field name="name">account.year_end.closing.tree</field>
+        <field name="model">account.year_end.closing</field>
+        <field name="arch" type="xml">
+            <tree string="Year-End Closing History" create="false">
+                <field name="year"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="closing_date"/>
+                <field name="move_id"/>
+                <field name="user_id"/>
+                <field name="state"/>
+                <button name="action_view_move" string="View Entry" type="object" icon="fa-eye" attrs="{'invisible': [('move_id', '=', False)]}"/>
+                <button name="action_confirm" string="Post &amp; Lock" type="object" icon="fa-check" attrs="{'invisible': [('state', '!=', 'draft')]}" class="btn-primary"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_account_year_end_closing_history" model="ir.actions.act_window">
+        <field name="name">Year-End Closing History</field>
+        <field name="res_model">account.year_end.closing</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu items -->
+    <menuitem id="menu_account_closing_root" 
+              name="Year-End Closing" 
+              parent="account.menu_finance_entries" 
+              sequence="100"/>
+
+    <menuitem id="menu_account_closing_agent" 
+              name="Run Closing Agent" 
+              parent="menu_account_closing_root" 
+              action="action_account_year_end_closing_wizard" 
+              sequence="10"/>
+
+    <menuitem id="menu_account_closing_history" 
+              name="Closing History" 
+              parent="menu_account_closing_root" 
+              action="action_account_year_end_closing_history" 
+              sequence="20"/>
+</odoo>

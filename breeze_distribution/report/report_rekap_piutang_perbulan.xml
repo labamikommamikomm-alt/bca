@@ -72,6 +72,24 @@
               </tbody>
             </table>
           </div>
+          <!-- Signatures -->
+          <div class="row mt-4">
+            <div class="col-4 text-center">
+              <p>Admin Piutang</p>
+              <br/><br/><br/><br/>
+              <hr style="height:1px;border-width:0; color:black; background-color:black;"/>
+            </div>
+            <div class="col-4 text-center">
+              <p>Sales</p>
+              <br/><br/><br/><br/>
+              <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+            </div>
+            <div class="col-4 text-center">
+              <p>Direktur</p>
+              <br/><br/><br/><br/>
+              <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+            </div>
+          </div>
         </div>
       </t>
     </t>

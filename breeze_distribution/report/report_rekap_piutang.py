@@ -1,4 +1,4 @@
-from odoo import api, models, fields
+from odoo import api, models, fields, _
 from odoo.exceptions import ValidationError, UserError
 import json
 
@@ -8,11 +8,11 @@ class ReportPiutang(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        if not data.get('form') or not self.env.context.get('active_model'):
+        if not data.get('form'):
             raise UserError(
                 _("Form content is missing, this report cannot be printed."))
-        model = self.env.context.get('active_model')
-        docs = self.env[model].browse(self.env.context.get('active_ids', []))
+        model = self.env.context.get('active_model') or 'report.rekap_piutang'
+        docs = self.env[model].browse(self.env.context.get('active_ids', [])) if model else []
         # form_data = data['form']
         # raise ValidationError(data['form']['from_date'])
 
@@ -22,8 +22,8 @@ class ReportPiutang(models.AbstractModel):
             ('invoice_date', '<=', data['form']['date_to'])
         ]
         
-        if data['form'].get('user_id'):
-            domain.append(('invoice_user_id', '=', data['form']['user_id'][0] if isinstance(data['form']['user_id'], list) else data['form']['user_id']))
+        if data['form'].get('team_id'):
+            domain.append(('team_id', '=', data['form']['team_id'][0] if isinstance(data['form']['team_id'], list) else data['form']['team_id']))
             
         if data['form'].get('partner_id'):
             domain.append(('partner_id', '=', data['form']['partner_id'][0] if isinstance(data['form']['partner_id'], list) else data['form']['partner_id']))
@@ -38,7 +38,14 @@ class ReportPiutang(models.AbstractModel):
 
         company_name = self.env.company.name
         
-        
+        team_id = data['form'].get('team_id')
+        if team_id:
+            team_id = team_id[0] if isinstance(team_id, list) else team_id
+            data['form']['team_name'] = self.env['crm.team'].browse(team_id).name
+        partner_id = data['form'].get('partner_id')
+        if partner_id:
+            partner_id = partner_id[0] if isinstance(partner_id, list) else partner_id
+            data['form']['partner_name'] = self.env['res.partner'].browse(partner_id).name
 
         rows = {}
         for rec in invoice:
@@ -50,14 +57,21 @@ class ReportPiutang(models.AbstractModel):
                 'terbayar': rec.amount_total - rec.amount_residual,
                 'sisa': rec.amount_residual,
                 'wilayah': rec.partner_id.city,
-                'sales': rec.team_id.name,
+                'sales': rec.team_id.name or '',
                 'keterangan': rec.payment_state,
                 'currency_id': rec.currency_id
             }
         lines = []
+        total_piutang = 0
+        total_terbayar = 0
+        total_sisa = 0
         
         for i in rows:
-            lines.append(rows[i])
+            line = rows[i]
+            lines.append(line)
+            total_piutang += line['jumlah']
+            total_terbayar += line['terbayar']
+            total_sisa += line['sisa']
 
         # raise ValidationError(json.dumps(lines))
         return {
@@ -65,7 +79,11 @@ class ReportPiutang(models.AbstractModel):
           'doc_ids': docids,
           'company_name': company_name,
           'docs': docs,
-          'data': data['form']
+          'data': data['form'],
+          'total_piutang': total_piutang,
+          'total_terbayar': total_terbayar,
+          'total_sisa': total_sisa,
+          'currency_id': self.env.company.currency_id,
         }
 
         

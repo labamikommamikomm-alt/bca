@@ -63,6 +63,14 @@ class ExportVendorBillWizard(models.TransientModel):
         grand_total_val = workbook.add_format({'bold': True, 'bg_color': '#f9f9f9', 'border': 1, 'align': 'right', 'num_format': '#,##0'})
 
         sheet.merge_range('A1:L1', 'Rekap Pembayaran Hutang', title_format)
+        
+        # Compute date range for Excel header
+        invoice_dates = docs.mapped('invoice_date')
+        if invoice_dates and any(invoice_dates):
+            date_from = min(invoice_dates).strftime('%d/%m/%Y')
+            date_to = max(invoice_dates).strftime('%d/%m/%Y')
+            parent_period = f'Periode: {date_from} s/d {date_to}'
+            sheet.merge_range('A2:L2', parent_period, workbook.add_format({'align': 'center'}))
 
         headers = []
         if self.show_nomor:
@@ -88,7 +96,7 @@ class ExportVendorBillWizard(models.TransientModel):
         if self.show_status:
             headers.append('Status Pembayaran')
 
-        row = 2
+        row = 3
         for col_num, header in enumerate(headers):
             sheet.write(row, col_num, header, header_format)
             sheet.set_column(col_num, col_num, 15) # Default width
@@ -126,10 +134,10 @@ class ExportVendorBillWizard(models.TransientModel):
                 sheet.write(row, col, o.l10n_id_tax_number or '', text_center)
                 col += 1
             if self.show_untaxed_amount:
-                sheet.write_number(row, col, o.amount_untaxed_signed or 0.0, currency_format)
+                sheet.write_number(row, col, abs(o.amount_untaxed_signed or 0.0), currency_format)
                 col += 1
             if self.show_total:
-                sheet.write_number(row, col, o.amount_total_signed or 0.0, currency_format)
+                sheet.write_number(row, col, abs(o.amount_total_signed or 0.0), currency_format)
                 col += 1
             if self.show_last_payment_date:
                 if o.last_payment_date:
@@ -155,7 +163,7 @@ class ExportVendorBillWizard(models.TransientModel):
             
             num += 1
             if self.show_grand_total:
-                cumulative_grand_total += o.amount_total
+                cumulative_grand_total += abs(o.amount_total_signed)
             
             row += 1
 

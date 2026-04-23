@@ -1,4 +1,4 @@
-from odoo import api, models, fields
+from odoo import api, models, fields, _
 from odoo.exceptions import UserError
 from datetime import date
 import calendar
@@ -10,7 +10,7 @@ class ReportRekapPiutangPersales(models.AbstractModel):
     def _get_report_values(self, docids, data=None):
         if not data.get('form'):
             raise UserError(
-                ("Form content is missing, this report cannot be printed."))
+                _("Form content is missing, this report cannot be printed."))
         
         form_data = data['form']
 
@@ -35,8 +35,8 @@ class ReportRekapPiutangPersales(models.AbstractModel):
             except Exception:
                 pass
                 
-        if form_data.get('sales_id'):
-            domain.append(('invoice_user_id', '=', form_data['sales_id']))
+        if form_data.get('team_id'):
+            domain.append(('team_id', '=', form_data['team_id']))
 
         invoices = self.env['account.move'].search(domain)
         
@@ -62,11 +62,11 @@ class ReportRekapPiutangPersales(models.AbstractModel):
         }
         bulan_label = bulan_map.get(form_data.get('bulan_selection'), '-')
 
-        sales_name = "Semua Sales"
-        if form_data.get('sales_id'):
-            sales_user = self.env['res.users'].browse(form_data['sales_id'])
-            if sales_user.exists():
-                sales_name = sales_user.name
+        team_name = "Semua Sales Team"
+        if form_data.get('team_id'):
+            sales_team = self.env['crm.team'].browse(form_data['team_id'])
+            if sales_team.exists():
+                team_name = sales_team.name
 
         return {
           'lines': lines,
@@ -74,6 +74,6 @@ class ReportRekapPiutangPersales(models.AbstractModel):
           'company_name': company.name,
           'data': form_data,
           'bulan_label': bulan_label,
-          'sales_name': sales_name,
+          'team_name': team_name,
           'currency_id': currency_id,
         }

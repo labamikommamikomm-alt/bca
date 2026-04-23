@@ -30,8 +30,8 @@
                 <t t-if="data.get('payment_date_to')"><span t-esc="data['payment_date_to']"/></t>
                 <t t-else="">-</t>
                 <br/>
-                <strong>Kolektor / Sales: </strong>
-                <span t-esc="data.get('user_name', 'Semua')"/>
+                <strong>Sales Team / Kolektor: </strong>
+                <span t-esc="data.get('team_name', 'Semua')"/>
                   <br/>
                 <strong>Bank / Kas: </strong>
                 <span t-esc="data.get('journal_name', 'Semua')"/>
@@ -47,22 +47,23 @@
                 <tr>
                   <th name="th_no" scope="col">No</th>
                   <th name="th_faktur" scope="col">Faktur</th>
-                  <th name="th_tgl" scope="col">Tanggal</th>
+                  <th name="th_tgl" scope="col">Tgl</th>
                   <th name="th_customer" scope="col">Customer</th>
                   <th name="th_tgl_lunas" scope="col">Tgl lunas</th>
                   <th name="th_keterangan" scope="col">Keterangan</th>
-                  <th name="th_admin" scope="col">Admin</th>
                   <th name="th_saldo" scope="col">Saldo</th>
-                  <th name="th_ppn" scope="col">PPN</th>
-                  <th name="th_pph" scope="col">PPh</th>
+                  <t t-foreach="dynamic_tax_names" t-as="tax_name">
+                      <th scope="col"><span t-esc="tax_name"/></th>
+                  </t>
                   <th name="th_bayar" scope="col">Bayar</th>
                 </tr>
               </thead>
               <tbody>
                 <t t-foreach="lines" t-as="line">
                   <tr>
-                    <td colspan="10">
-                    Penagih : <span t-esc="line['penagih']"/>
+                    <t t-set="colspan_val" t-value="6 + len(dynamic_tax_names) + 2"/>
+                    <td t-att-colspan="colspan_val">
+                     Penagih : <span t-esc="line['penagih']"/>
                     </td>
                   </tr>
                   <t t-foreach="line['lines']" t-as="linex">
@@ -78,8 +79,6 @@
                       </td>
                       <td>
                         <span t-esc="linex['customer']"/>
-                        (                        <span t-esc="linex['sales']"/>
-)
                       </td>
                       <td>
                         <t t-foreach="linex['tgl_lunas']" t-as="tgl_lunas">
@@ -88,60 +87,70 @@
                       </td>
                       <td>
                         <span t-esc="linex['keterangan']"/>
-                        <t t-foreach="linex['jenis']" t-as="jenis">
-                          (                          <span t-esc="jenis"/>
-)
-                        </t>
-                      </td>
-                      <td>
-                        <t t-foreach="linex['taxes']" t-as="taxe">
-                          <t t-if="taxe['nama'] == 'admin'">
-                            <span t-esc="taxe['jumlah']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
-                          </t>
-                        </t>
                       </td>
                       <td>
                         <span t-esc="linex['saldo']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
                       </td>
-                      <td>
-                        <span t-esc="linex['ppn']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
-                      </td>
-                      <td>
-                        <t t-foreach="linex['taxes']" t-as="taxe">
-                          <t t-if="taxe['nama'] != 'admin'">
-                            <span t-esc="taxe['jumlah']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
-                          </t>
-                        </t>
-                      </td>
+                      <t t-foreach="dynamic_tax_names" t-as="tax_name">
+                        <td>
+                          <span t-esc="linex['taxes'][tax_name]" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                        </td>
+                      </t>
                       <td>
                         <span t-esc="linex['bayar']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
                       </td>
                     </tr>
                   </t>
-                  <tr>
-                    <td colspan="6" class="text-center">
-                    Sub Total
-                    </td>
-                    <td>
-                      <span t-esc="line['total_admin']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>,
-
-                    </td>
+                  <tr class="font-weight-bold table-info">
+                    <td colspan="6" class="text-right">Sub Total</td>
                     <td>
                       <span t-esc="line['total_saldo']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
                     </td>
-                    <td>
-                      <span t-esc="line['total_ppn']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
-                    </td>
-                    <td>
-                      <span t-esc="line['total_pph']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
-                    </td>
+                    <t t-foreach="dynamic_tax_names" t-as="tax_name">
+                      <td>
+                        <span t-esc="line['total_taxes'][tax_name]" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                      </td>
+                    </t>
                     <td>
                       <span t-esc="line['total_bayar']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
                     </td>
                   </tr>
                 </t>
+                <!-- Grand Total Row -->
+                <tr class="font-weight-bold table-success text-dark">
+                  <td colspan="6" class="text-right">GRAND TOTAL</td>
+                  <td>
+                    <span t-esc="grand_total_saldo" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                  </td>
+                  <t t-foreach="dynamic_tax_names" t-as="tax_name">
+                    <td>
+                      <span t-esc="grand_total_taxes[tax_name]" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                    </td>
+                  </t>
+                  <td>
+                    <span t-esc="grand_total_bayar" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                  </td>
+                </tr>
               </tbody>
             </table>
+          </div>
+          <!-- Signatures -->
+          <div class="row mt-4">
+            <div class="col-4 text-center">
+              <p>Admin Piutang</p>
+              <br/><br/><br/><br/>
+              <hr style="height:1px;border-width:0; color:black; background-color:black;"/>
+            </div>
+            <div class="col-4 text-center">
+              <p>Sales</p>
+              <br/><br/><br/><br/>
+              <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+            </div>
+            <div class="col-4 text-center">
+              <p>Direktur</p>
+              <br/><br/><br/><br/>
+              <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+            </div>
           </div>
         </div>
       </t>

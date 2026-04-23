@@ -13,6 +13,11 @@ class ReportExportVendorBill(models.AbstractModel):
         
         docs = self.env['account.move'].browse(active_ids)
         
+        # Compute date range
+        invoice_dates = docs.mapped('invoice_date')
+        date_from = min(invoice_dates) if invoice_dates and any(invoice_dates) else False
+        date_to = max(invoice_dates) if invoice_dates and any(invoice_dates) else False
+
         # Prepare context data to map properly to QWeb execution
         form_data = data and data.get('form', {}) or {}
         
@@ -20,4 +25,6 @@ class ReportExportVendorBill(models.AbstractModel):
             'docs': docs,
             'data': form_data,
             'company': self.env.user.company_id,
+            'date_from': date_from,
+            'date_to': date_to,
         }

@@ -2,58 +2,81 @@
 <odoo>
     <template id="report_rekap_penjualan">
     <t t-call="web.html_container">
-        <t t-call="web.external_layout">
+        <t t-set="h_color" t-value="header_color or '#f2f2f2'"/>
+        <t t-call="web.basic_layout">
             <style>
-                .table-rekap {
-                    width: 100% !important;
-                    table-layout: fixed; /* Memaksa kolom mengikuti width yang ditentukan */
-                    border-collapse: collapse;
+                .page {
+                    font-family: Arial, sans-serif;
+                    font-size: 9px;
+                    margin-top: 20px;
                 }
-                .table-rekap th, .table-rekap td {
-                    padding: 2px 4px !important; /* Mengecilkan padding agar teks punya ruang */
-                    vertical-align: middle !important;
+                .table-rekap {
+                    width: 100%;
+                    border-collapse: collapse;
+                    table-layout: fixed; /* Keep it fixed but ensure col widths are safe */
+                }
+                .table-rekap th {
+                    background-color: <t t-esc="h_color"/>;
+                    text-align: center;
+                    border: 1px solid black !important;
+                    padding: 4px 2px !important;
+                }
+                .table-rekap td {
+                    border: 1px solid black !important;
+                    padding: 2px 4px !important;
+                    vertical-align: top !important; /* Supaya rapi kalau teks panjang */
                     word-wrap: break-word;
                 }
                 .nowrap {
-                    white-space: nowrap !important; /* Mencegah angka duit turun ke bawah */
+                    white-space: nowrap !important;
                 }
                 .text-right {
                     text-align: right !important;
                 }
+                .text-center {
+                    text-align: center !important;
+                }
+                /* Mencegah row terpotong antar halaman */
+                tr {
+                    page-break-inside: avoid !important;
+                }
             </style>
             
             <div class="page">
-            <div class="text-center" style="border-bottom: 2px solid black; margin-bottom: 20px;">
-                        <h3><span t-esc="company_name"/></h3>
-                        <h2>REKAP PENJUALAN</h2>
-                        <h4 t-if="data.get('customer_id')">Customer: <t t-esc="data['customer_id'][1]"/></h4>
-                        <p>
-                            Periode: 
-                            <span t-esc="data.get('date_from')" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/> 
-                            s/d 
-                            <span t-esc="data.get('date_to')" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/>
-                        </p>
-                    </div>
-                <table class="table table-sm table-bordered table-rekap">
+                <div class="text-center" style="border-bottom: 2px solid black; margin-bottom: 15px; padding-bottom: 10px;">
+                    <h3 style="margin:0;"><span t-esc="company_name"/></h3>
+                    <h2 style="margin:5px 0;">REKAP PENJUALAN</h2>
+                    <h4 style="margin:0;">
+                        Customer: <t t-esc="data['customer_id'][1] if data.get('customer_id') else 'Semua Pembeli'"/>
+                    </h4>
+                    <p style="margin:0;">
+                        Periode: 
+                        <span t-esc="data.get('date_from')" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/> 
+                        s/d 
+                        <span t-esc="data.get('date_to')" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/>
+                    </p>
+                </div>
+
+                <table class="table-rekap">
                     <thead>
-                        <tr style="font-size: 9px; background-color: #f2f2f2;">
+                        <tr>
                             <th style="width: 3%;">NO</th>
-                            <th style="width: 7%;">TGL</th>
+                            <th style="width: 8%;">TGL</th>
                             <th style="width: 10%;">FAKTUR</th>
-                            <th style="width: 15%;">PRODUK</th>
-                            <th style="width: 4%;">QTY</th>
-                            <th style="width: 4%;">SAT</th>
+                            <th style="width: 17%;">PRODUK</th>
+                            <th style="width: 5%;">QTY</th>
+                            <th style="width: 5%;">SAT</th>
                             <th style="width: 8%;">BRUTO/S AT</th>
-                            <th style="width: 4%;">DIS C%</th>
+                            <th style="width: 4%;">DISC%</th>
                             <th style="width: 8%;">TOT BRUTO</th>
-                            <th style="width: 7%;">TOT DISC</th>
+                            <th style="width: 8%;">TOT DISC</th>
                             <th style="width: 8%;">NETTO</th>
-                            <th style="width: 8%;">SUBTOTA L</th>
-                            <th style="width: 6%;">PPN</th>
-                            <th style="width: 8%;">TOTAL</th>
+                            <th style="width: 8%;">SUBTOTAL</th>
+                            <th style="width: 8%;">PPN</th>
+                            <th style="width: 10%;">TOTAL</th>
                         </tr>
                     </thead>
-                    <tbody style="font-size: 9px;">
+                    <tbody>
                         <t t-foreach="lines" t-as="invoice">
                             <t t-set="invoice_detail_count" t-value="len(invoice['invoice_lines_details'])"/>
                             <t t-foreach="invoice['invoice_lines_details']" t-as="detail">
@@ -61,11 +84,9 @@
                                     <td t-if="detail['idx'] == 0" t-att-rowspan="invoice_detail_count" class="text-center">
                                         <span t-esc="invoice_index + 1"/>
                                     </td>
-                                    
-                                    <td t-if="detail['idx'] == 0" t-att-rowspan="invoice_detail_count" class="nowrap">
+                                    <td t-if="detail['idx'] == 0" t-att-rowspan="invoice_detail_count" class="text-center">
                                         <span t-esc="invoice['tgl_faktur']" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/>
                                     </td>
-                                    
                                     <td t-if="detail['idx'] == 0" t-att-rowspan="invoice_detail_count">
                                         <span t-esc="invoice['faktur']"/>
                                     </td>
@@ -73,35 +94,47 @@
                                     <td><span t-esc="detail['nama_barang']"/></td>
                                     <td class="text-right"><span t-esc="detail['qty']"/></td>
                                     <td class="text-center"><span t-esc="detail['sat']"/></td>
-                                    
-                                    <td class="text-right nowrap">
-                                        <span t-esc="detail['harga_bruto_per_satuan']" t-options='{"widget": "monetary", "display_currency": invoice["currency_id"]}'/>
-                                    </td>
+                                    <td class="text-right"><span t-esc="detail['harga_bruto_per_satuan']" t-options='{"widget": "float", "precision": 0}'/></td>
                                     <td class="text-right"><span t-esc="detail['diskon_persen']"/></td>
-                                    <td class="text-right nowrap">
-                                        <span t-esc="detail['jumlah_bruto']" t-options='{"widget": "monetary", "display_currency": invoice["currency_id"]}'/>
-                                    </td>
-                                    <td class="text-right nowrap">
-                                        <span t-esc="detail['jumlah_diskon']" t-options='{"widget": "monetary", "display_currency": invoice["currency_id"]}'/>
-                                    </td>
-                                    <td class="text-right nowrap">
-                                        <span t-esc="detail['jumlah_netto']" t-options='{"widget": "monetary", "display_currency": invoice["currency_id"]}'/>
-                                    </td>
+                                    <td class="text-right"><span t-esc="detail['jumlah_bruto']" t-options='{"widget": "float", "precision": 0}'/></td>
+                                    <td class="text-right"><span t-esc="detail['jumlah_diskon']" t-options='{"widget": "float", "precision": 0}'/></td>
+                                    <td class="text-right"><span t-esc="detail['jumlah_netto']" t-options='{"widget": "float", "precision": 0}'/></td>
 
-                                    <td t-if="detail['idx'] == 0" t-att-rowspan="invoice_detail_count" class="text-right nowrap">
-                                        <span t-esc="invoice['sub_total']" t-options='{"widget": "monetary", "display_currency": invoice["currency_id"]}'/>
+                                    <td t-if="detail['idx'] == 0" t-att-rowspan="invoice_detail_count" class="text-right">
+                                        <span t-esc="invoice['sub_total']" t-options='{"widget": "float", "precision": 0}'/>
                                     </td>
-                                    <td t-if="detail['idx'] == 0" t-att-rowspan="invoice_detail_count" class="text-right nowrap">
-                                        <span t-esc="invoice['ppn']" t-options='{"widget": "monetary", "display_currency": invoice["currency_id"]}'/>
+                                    <td t-if="detail['idx'] == 0" t-att-rowspan="invoice_detail_count" class="text-right">
+                                        <span t-esc="invoice['ppn']" t-options='{"widget": "float", "precision": 0}'/>
                                     </td>
-                                    <td t-if="detail['idx'] == 0" t-att-rowspan="invoice_detail_count" class="text-right nowrap">
-                                        <span t-esc="invoice['total']" t-options='{"widget": "monetary", "display_currency": invoice["currency_id"]}'/>
+                                    <td t-if="detail['idx'] == 0" t-att-rowspan="invoice_detail_count" class="text-right">
+                                        <span t-esc="invoice['total']" t-options='{"widget": "float", "precision": 0}'/>
                                     </td>
                                 </tr>
                             </t>
                         </t>
+                        <tr style="font-weight: bold; background-color: #e9ecef;">
+                            <td colspan="11" class="text-right">GRAND TOTAL</td>
+                            <td class="text-right"><span t-esc="tn" t-options='{"widget": "float", "precision": 0}'/></td>
+                            <td class="text-right"><span t-esc="tp" t-options='{"widget": "float", "precision": 0}'/></td>
+                            <td class="text-right"><span t-esc="total" t-options='{"widget": "float", "precision": 0}'/></td>
+                        </tr>
                     </tbody>
                 </table>
+
+                <div class="row mt-5">
+                    <div class="col-4 text-center">
+                        <p>Admin Piutang</p>
+                        <div style="margin-top: 60px; border-top: 1px solid black; width: 80%; margin-left: 10%;"></div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <p>Sales</p>
+                        <div style="margin-top: 60px; border-top: 1px solid black; width: 80%; margin-left: 10%;"></div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <p>Direktur</p>
+                        <div style="margin-top: 60px; border-top: 1px solid black; width: 80%; margin-left: 10%;"></div>
+                    </div>
+                </div>
             </div>
         </t>
     </t>

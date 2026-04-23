@@ -23,7 +23,7 @@
                 <strong>Dari Tanggal: </strong> <span t-esc="data.get('date_from', '-')"/><br/>
                 <strong>Sampai Tanggal: </strong> <span t-esc="data.get('date_to', '-')"/><br/>
                 <strong>Periode: </strong> <span t-esc="bulan_label"/> / <span t-esc="data.get('tahun_selection', '-')"/><br/>
-                <strong>Sales: </strong> <span t-esc="sales_name"/><br/>
+                <strong>Sales Team: </strong> <span t-esc="team_name"/><br/>
             </div>
             <div class="col-6 text-right">
                 <strong>Tanggal Cetak: </strong>
@@ -94,6 +94,24 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          <!-- Signatures -->
+          <div class="row mt-4">
+            <div class="col-4 text-center">
+              <p>Admin Piutang</p>
+              <br/><br/><br/><br/>
+              <hr style="height:1px;border-width:0; color:black; background-color:black;"/>
+            </div>
+            <div class="col-4 text-center">
+              <p>Sales</p>
+              <br/><br/><br/><br/>
+              <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+            </div>
+            <div class="col-4 text-center">
+              <p>Direktur</p>
+              <br/><br/><br/><br/>
+              <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+            </div>
           </div>
         </div>
       </t>

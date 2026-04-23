@@ -58,8 +58,33 @@
                       </td>
                     </tr>
                   </t>
+                  <!-- Grand Total Row -->
+                  <tr class="font-weight-bold table-info">
+                    <td colspan="2" class="text-right">Grand Total</td>
+                    <td style="text-align:right"><span t-esc="total_piutang" t-options='{"widget": "monetary", "display_currency": currency_id}'/></td>
+                    <td style="text-align:right"><span t-esc="total_terbayar" t-options='{"widget": "monetary", "display_currency": currency_id}'/></td>
+                    <td style="text-align:right"><span t-esc="total_sisa" t-options='{"widget": "monetary", "display_currency": currency_id}'/></td>
+                  </tr>
                 </tbody>
               </table>
+            </div>
+            <!-- Signatures -->
+            <div class="row mt-4">
+              <div class="col-4 text-center">
+                <p>Admin Piutang</p>
+                <br/><br/><br/><br/>
+                <hr style="height:1px;border-width:0; color:black; background-color:black;"/>
+              </div>
+              <div class="col-4 text-center">
+                <p>Sales</p>
+                <br/><br/><br/><br/>
+                <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+              </div>
+              <div class="col-4 text-center">
+                <p>Direktur</p>
+                <br/><br/><br/><br/>
+                <hr style="height:1px;border-width:0; color:black; background-color:black;" />
+              </div>
             </div>
           </div>
         

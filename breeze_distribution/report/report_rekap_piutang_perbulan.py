@@ -1,4 +1,4 @@
-from odoo import api, models, fields
+from odoo import api, models, fields, _
 from odoo.exceptions import UserError
 from datetime import date
 import calendar
@@ -10,7 +10,7 @@ class ReportRekapPiutangPerbulan(models.AbstractModel):
     def _get_report_values(self, docids, data=None):
         if not data.get('form'):
             raise UserError(
-                ("Form content is missing, this report cannot be printed."))
+                _("Form content is missing, this report cannot be printed."))
         
         selected_year = int(data['form']['year'])
         

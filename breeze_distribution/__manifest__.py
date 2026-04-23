@@ -95,6 +95,7 @@
         'views/inherit_res_company.xml',
         'views/inherit_crm_team.xml',
         'views/sale_order_line_last_price_customer_views.xml',
+        'views/purchase_order_line_last_price_vendor_views.xml',
         'views/account_custom_menu.xml'
     ],
     # only loaded in demonstration mode

@@ -26,11 +26,11 @@
                 <t t-else="">-</t>
                 <br/>
                 <strong>Customer: </strong>
-                <t t-if="data.get('partner_id')"><span t-esc="data['partner_id'][1] if isinstance(data['partner_id'], list) else data['partner_id']"/></t>
+                <t t-if="data.get('partner_name')"><span t-esc="data['partner_name']"/></t>
                 <t t-else="">Semua</t>
                 <br/>
-                <strong>Sales / Kolektor: </strong>
-                <t t-if="data.get('user_id')"><span t-esc="data['user_id'][1] if isinstance(data['user_id'], list) else data['user_id']"/></t>
+                <strong>Sales Team / Kolektor: </strong>
+                <t t-if="data.get('team_name')"><span t-esc="data['team_name']"/></t>
                 <t t-else="">Semua</t>
                 <br/>
                 <strong>Status Pembayaran: </strong>
@@ -70,10 +70,10 @@
                     <span t-esc="line_index + 1"/>
                   </td>
                   <td>
-                    <span t-esc="line['tanggal_faktur'].strftime('%d/%m/%Y ')"/>
+                    <span t-esc="line['no_faktur']"/>
                   </td>
                   <td>
-                    <span t-esc="line['no_faktur']"/>
+                    <span t-esc="line['tanggal_faktur'].strftime('%d/%m/%Y ')"/>
                   </td>
                   <td>
                     <span t-esc="line['customer']"/>
@@ -98,41 +98,41 @@
                   </td>
                 </tr>
               </t>
+              <!-- Grand Total Row -->
+              <tr class="font-weight-bold table-info">
+                <td colspan="4" class="text-right">Grand Total</td>
+                <td><span t-esc="total_piutang" t-options='{"widget": "monetary", "display_currency": currency_id}'/></td>
+                <td><span t-esc="total_terbayar" t-options='{"widget": "monetary", "display_currency": currency_id}'/></td>
+                <td><span t-esc="total_sisa" t-options='{"widget": "monetary", "display_currency": currency_id}'/></td>
+                <td colspan="3"></td>
+              </tr>
             </tbody>
           </table>
         </div>
-        <div class="row">
-          <div class="col-auto text-center">
-            <p>Bag. Gudang</p>
+        <div class="row mt-4">
+          <div class="col-4 text-center">
+            <p>Admin Piutang</p>
             <br/>
             <br/>
             <br/>
             <br/>
             <hr style="height:1px;border-width:0; color:black; background-color:black;"/>
           </div>
-          <div class="col-auto text-center">
-            <p>Bag. Hutang</p>
+          <div class="col-4 text-center">
+            <p>Sales</p>
             <br/>
             <br/>
             <br/>
             <br/>
             <hr style="height:1px;border-width:0; color:black; background-color:black;" />
           </div>
-          <div class="col-auto text-center">
-            <p>Dibuat Oleh</p>
+          <div class="col-4 text-center">
+            <p>Direktur</p>
             <br/>
             <br/>
             <br/>
             <br/>
             <hr style="height:1px;border-width:0; color:black; background-color:black;" />
-          </div>
-          <div class="col-auto text-center">
-            <p>Manajer</p>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <hr style="height:1px; border-width:0; color:black; background-color:black;"/>
           </div>
         </div>
       </div>

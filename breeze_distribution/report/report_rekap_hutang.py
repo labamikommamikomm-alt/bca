@@ -8,10 +8,10 @@ class ReportHutang(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        if not data.get('form') or not self.env.context.get('active_model'):
+        if not data.get('form'):
             raise UserError(
                 ("Form content is missing, this report cannot be printed."))
-        model = self.env.context.get('active_model')
+        model = self.env.context.get('active_model') or 'report.rekap_hutang'
         docs = self.env[model].browse(self.env.context.get('active_ids', []))
         # form_data = data['form']
         # raise ValidationError(data['form']['from_date'])

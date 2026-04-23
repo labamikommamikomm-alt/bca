@@ -1,8 +1,88 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.tools.misc import get_lang
 from odoo.exceptions import ValidationError, RedirectWarning, UserError
+import logging
+
+_logger = logging.getLogger(__name__)
+
+class ProductLastPriceVendor(models.Model):
+    _name = 'product.last.price.vendor'
+    _description = 'Last price of a product for a specific vendor'
+    _rec_name = 'last_price'
+    _sql_constraints = [
+        ('product_partner_unique', 'unique(product_id, partner_id)',
+         'The combination of product and vendor must be unique!')
+    ]
+
+    product_id = fields.Many2one(
+        'product.product', 
+        string='Product', 
+        required=True
+    )
+    partner_id = fields.Many2one(
+        'res.partner', 
+        string='Vendor', 
+        required=True
+    )
+    last_price = fields.Float(
+        string='Last Price', 
+        digits='Product Price', 
+        required=True
+    )
+    currency_id = fields.Many2one(
+        'res.currency', 
+        string='Currency', 
+        default=lambda self: self.env.company.currency_id.id
+    )
+
+    def init(self):
+        """
+        Runs the migration function on module update/installation.
+        """
+        self.env.cr.execute("SELECT count(*) FROM product_last_price_vendor")
+        if self.env.cr.fetchone()[0] == 0:
+            self._migrate_last_prices()
+
+    def _migrate_last_prices(self):
+        """
+        Helper method to perform the data migration for purchase last prices.
+        """
+        _logger.info("Starting historical data migration for product last purchase prices...")
+        
+        # Taking confirmed and done purchase orders, sorted by date descending.
+        purchase_orders = self.env['purchase.order'].search([
+            ('state', 'in', ['purchase', 'done'])
+        ], order='date_order desc')
+
+        purchase_lines = self.env['purchase.order.line'].search([
+            ('order_id', 'in', purchase_orders.ids),
+            ('price_unit', '>', 0)
+        ])
+
+        last_prices = {}
+        for line in purchase_lines:
+            product = line.product_id
+            vendor = line.order_id.partner_id
+
+            if not product or not vendor:
+                continue
+
+            key = (product.id, vendor.id)
+            
+            if key not in last_prices:
+                last_prices[key] = line.price_unit
+
+        for key, price in last_prices.items():
+            product_id, partner_id = key
+            self.create({
+                'product_id': product_id,
+                'partner_id': partner_id,
+                'last_price': price,
+            })
+        _logger.info("Historical data migration for purchase last prices completed.")
+
 
 
 class PurchaseOrderInherit(models.Model):
@@ -131,6 +211,16 @@ class PurchaseOrderInherit(models.Model):
             self._bill_confirmation()
         return res
 
+    @api.onchange('partner_id')
+    def _onchange_partner_id_update_prices(self):
+        """
+        When the vendor is changed, re-evaluate the prices for all
+        the purchase order lines based on the new vendor's last prices.
+        """
+        if self.partner_id and self.order_line:
+            for line in self.order_line:
+                line._product_id_change()
+
 
 class PurchaseOrderLineInherit(models.Model):
     _inherit = "purchase.order.line"
@@ -156,6 +246,16 @@ class PurchaseOrderLineInherit(models.Model):
         self.name = self._get_product_purchase_description(product_lang)
 
         self._compute_tax_id()
+
+        # Fetch last purchase price for the chosen product and vendor
+        if self.product_id and self.order_id.partner_id:
+            last_price_record = self.env['product.last.price.vendor'].search([
+                ('product_id', '=', self.product_id.id),
+                ('partner_id', '=', self.order_id.partner_id.id)
+            ], limit=1)
+
+            if last_price_record:
+                self.price_unit = last_price_record.last_price
 
     @api.depends("product_qty", "price_unit", "taxes_id", "discount", "fixed_discount")
     def _compute_amount(self):
@@ -187,3 +287,43 @@ class PurchaseOrderLineInherit(models.Model):
                     "price_total": taxes["total_included"],
                 }
             )
+
+    def _update_last_price_for_vendor(self):
+        """
+        Helper method to update or create the last price record
+        for the current purchase order line's product and vendor.
+        """
+        if self.product_id and self.order_id.partner_id and self.price_unit > 0:
+            last_price_record = self.env['product.last.price.vendor'].search([
+                ('product_id', '=', self.product_id.id),
+                ('partner_id', '=', self.order_id.partner_id.id)
+            ], limit=1)
+
+            if last_price_record:
+                last_price_record.write({'last_price': self.price_unit})
+            else:
+                self.env['product.last.price.vendor'].create({
+                    'product_id': self.product_id.id,
+                    'partner_id': self.order_id.partner_id.id,
+                    'last_price': self.price_unit,
+                })
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """
+        Overrides create to update the last price per vendor after creation.
+        """
+        records = super(PurchaseOrderLineInherit, self).create(vals_list)
+        for record in records:
+            record._update_last_price_for_vendor()
+        return records
+
+    def write(self, vals):
+        """
+        Overrides write to update the last price per vendor after modification.
+        """
+        res = super(PurchaseOrderLineInherit, self).write(vals)
+        for record in self:
+            if 'price_unit' in vals:
+                record._update_last_price_for_vendor()
+        return res

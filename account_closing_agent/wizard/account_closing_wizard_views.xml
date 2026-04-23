@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_year_end_closing_wizard_form" model="ir.ui.view">
+        <field name="name">account.year_end_closing.wizard.form</field>
+        <field name="model">account.year_end_closing.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Year-End Closing Agent">
+                <field name="state" invisible="1"/>
+                
+                <div attrs="{'invisible': [('state', '!=', 'init')]}">
+                    <group>
+                        <group>
+                            <field name="year" options="{'format': 0}"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        <p><strong>Step 1:</strong> System will analyze nominal account balances and check for draft entries.</p>
+                    </div>
+                </div>
+
+                <div attrs="{'invisible': [('state', '!=', 'preview')]}">
+                    <h3>Analysis Complete</h3>
+                    <group>
+                        <field name="message" nolabel="1"/>
+                        <field name="total_balance" invisible="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Accounts Breakdown">
+                            <field name="line_ids">
+                                <tree>
+                                    <field name="account_id"/>
+                                    <field name="balance"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    <div class="alert alert-warning" role="alert">
+                        <p>Continuing will create a <strong>Draft Journal Entry</strong> in Dec 31 and update the fiscal year lock dates.</p>
+                        <p><em>Check the accounts above to ensure no expenses are missed.</em></p>
+                    </div>
+                </div>
+
+                <footer>
+                    <button name="action_calculate_balance" string="Analyze Year-End" type="object" class="btn-primary" attrs="{'invisible': [('state', '!=', 'init')]}"/>
+                    <button name="action_generate_closing_entry" string="Generate Draft Entry" type="object" class="btn-primary" attrs="{'invisible': [('state', '!=', 'preview')]}"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_account_year_end_closing_wizard" model="ir.actions.act_window">
+        <field name="name">Year-End Closing Agent</field>
+        <field name="res_model">account.year_end_closing.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

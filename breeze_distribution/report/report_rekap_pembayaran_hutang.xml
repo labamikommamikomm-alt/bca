@@ -35,6 +35,9 @@
                   <th name="th_tanggal_faktur" scope="col">Tanggal Faktur</th>
                   <th name="th_no_faktur" scope="col">No Faktur</th>
                   <th name="th_nama_suplier" scope="col">Nama Supplier</th>
+                  <th name="th_ppn" scope="col">PPN</th>
+                  <th name="th_pph" scope="col">PPh</th>
+                  <th name="th_admin" scope="col">Admin</th>
                   <th name="th_jumlah" scope="col">Jumlah</th>
                   <th name="th_jenis_pembayaran" scope="col">Jenis Pembayaran</th>
                   <th name="th_tanggal_pembayaran" scope="col">Tanggal Pembayaran</th>
@@ -56,6 +59,15 @@
                       <span t-esc="line['customer']"/>
                     </td>
                     <td>
+                      <span t-esc="line['ppn']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                    </td>
+                    <td>
+                      <span t-esc="line['pph']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                    </td>
+                    <td>
+                      <span t-esc="line['admin']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                    </td>
+                    <td>
                       <span t-esc="line['jumlah']" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
                     </td>
                     <td>
@@ -75,6 +87,15 @@
                 <tr>
                   <td colspan="4" class="text-center">
                     Total
+                  </td>
+                  <td>
+                    <span t-esc="total_ppn" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                  </td>
+                  <td>
+                    <span t-esc="total_pph" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
+                  </td>
+                  <td>
+                    <span t-esc="total_admin" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
                   </td>
                   <td>
                     <span t-esc="total" t-options='{"widget": "monetary", "display_currency": currency_id}'/>
