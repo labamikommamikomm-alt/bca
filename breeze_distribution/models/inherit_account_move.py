@@ -15,6 +15,37 @@ _logger = logging.getLogger(__name__)
 class InheritAccountMove(models.Model):
     _inherit = "account.move"
 
+    def action_update_all_last_purchase_prices(self):
+        """
+        Server action to find the latest transaction for every product
+        and update its 'harga_terakhir' and 'standard_price'.
+        """
+        # Get all products that have vendor bill lines
+        self.env.cr.execute("""
+            SELECT DISTINCT product_id 
+            FROM account_move_line 
+            WHERE product_id IS NOT NULL 
+              AND move_id IN (SELECT id FROM account_move WHERE move_type = 'in_invoice' AND state = 'posted')
+        """)
+        product_ids = [r[0] for r in self.env.cr.fetchall()]
+        
+        products = self.env['product.product'].browse(product_ids)
+        for product in products:
+            # Find the latest posted vendor bill line for this product
+            last_line = self.env['account.move.line'].search([
+                ('product_id', '=', product.id),
+                ('move_id.move_type', '=', 'in_invoice'),
+                ('move_id.state', '=', 'posted'),
+                ('price_unit', '>', 0)
+            ], order='date desc, id desc', limit=1)
+            
+            if last_line:
+                product.product_tmpl_id.sudo().write({
+                    'harga_terakhir': last_line.price_unit,
+                    'standard_price': last_line.price_unit,
+                })
+        return True
+
     FK_HEAD_LIST1 = [
         "FK",
         "KD_JENIS_TRANSAKSI",
@@ -316,7 +347,7 @@ class InheritAccountMove(models.Model):
 
                     # Dynamic Branch Prefix: Get from Company Settings or default
                     # Original code hardcoded 'A'. This should ideally be a config.
-                    branch_prefix = "P"  # TODO: Make this a setting on res.company
+                    branch_prefix = "A"  # TODO: Make this a setting on res.company
 
                     # Clean Tax Number and get last 8 digits
                     tax_number_clean = move.l10n_id_tax_number.replace(".", "").replace(
@@ -775,3 +806,55 @@ class GlobalTaxLine(models.Model):
     )
     amount = fields.Monetary(string="Jumlah")
     currency_id = fields.Many2one("res.currency", related="account_id.currency_id")
+
+
+class AccountMoveLineInherit(models.Model):
+    _inherit = "account.move.line"
+
+    @api.onchange("price_unit", "product_id")
+    def _onchange_price_update_product(self):
+        """
+        When the price is changed in a Vendor Bill, update the
+        product's global last purchase price and cost.
+        """
+        if (
+            self.move_id.move_type == "in_invoice"
+            and self.product_id
+            and self.price_unit > 0
+        ):
+            # Update product template (harga_terakhir and standard_price/cost)
+            # Use sudo to ensure we have permission to write to product master
+            self.product_id.product_tmpl_id.sudo().write(
+                {
+                    "harga_terakhir": self.price_unit,
+                    "standard_price": self.price_unit,
+                }
+            )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """
+        Ensure price is updated on creation of Vendor Bill lines.
+        """
+        records = super(AccountMoveLineInherit, self).create(vals_list)
+        for record in records:
+            if record.move_id.move_type == 'in_invoice' and record.product_id and record.price_unit > 0:
+                record.product_id.product_tmpl_id.sudo().write({
+                    'harga_terakhir': record.price_unit,
+                    'standard_price': record.price_unit,
+                })
+        return records
+
+    def write(self, vals):
+        """
+        Ensure price is updated on modification of Vendor Bill lines.
+        """
+        res = super(AccountMoveLineInherit, self).write(vals)
+        if 'price_unit' in vals or 'product_id' in vals:
+            for record in self:
+                if record.move_id.move_type == 'in_invoice' and record.product_id and record.price_unit > 0:
+                    record.product_id.product_tmpl_id.sudo().write({
+                        'harga_terakhir': record.price_unit,
+                        'standard_price': record.price_unit,
+                    })
+        return res

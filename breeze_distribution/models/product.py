@@ -15,26 +15,13 @@ class ProductInherit(models.Model):
 
     kadaluarsa = fields.Date(string="Kadaluarsa")
     
-    harga_terakhir = fields.Float(string='Harga Pembelian Terakhir', compute='_compute_harga_akhir')
+    harga_terakhir = fields.Float(string='Harga Pembelian Terakhir')
     
     def write(self, vals):
         res = super(ProductInherit, self).write(vals)
         self.syncQty()
         return res
     
-    @api.depends('seller_ids.price')
-    def _compute_harga_akhir(self):
-        for rec in self:
-            # Cek apakah produk ini memiliki data pemasok (seller)
-            if rec.seller_ids:
-                # Jika ada, ambil harga dari pemasok terakhir di daftar
-                rec.harga_terakhir = rec.seller_ids[-1].price
-            else:
-                # Jika tidak ada pemasok, atur harga terakhir menjadi 0
-                rec.harga_terakhir = 0.0
-         
-            
-            
     @api.onchange('multi_uom_category_id')
     def change_default_uom(self):
         # raise ValidationError('boop')

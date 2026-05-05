@@ -41,6 +41,17 @@
       </field>
     </record>
 
+    <record id="action_update_product_last_prices" model="ir.actions.server">
+        <field name="name">Sync Harga Terakhir (Semua Produk)</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+            model.action_update_all_last_purchase_prices()
+        </field>
+    </record>
+
   </data>
 
 

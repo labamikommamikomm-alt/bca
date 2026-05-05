@@ -56,23 +56,18 @@ class ProductLastPriceVendor(models.Model):
             ('state', 'in', ['purchase', 'done'])
         ], order='date_order desc')
 
-        purchase_lines = self.env['purchase.order.line'].search([
-            ('order_id', 'in', purchase_orders.ids),
-            ('price_unit', '>', 0)
-        ])
-
         last_prices = {}
-        for line in purchase_lines:
-            product = line.product_id
-            vendor = line.order_id.partner_id
-
-            if not product or not vendor:
-                continue
-
-            key = (product.id, vendor.id)
-            
-            if key not in last_prices:
-                last_prices[key] = line.price_unit
+        # Iterate through orders (newest first) and then their lines
+        for order in purchase_orders:
+            for line in order.order_line:
+                if not line.product_id or not order.partner_id or line.price_unit <= 0:
+                    continue
+                
+                key = (line.product_id.id, order.partner_id.id)
+                # Since we iterate newest orders first, the first time we see a product-vendor
+                # combination, it is the most recent price.
+                if key not in last_prices:
+                    last_prices[key] = line.price_unit
 
         for key, price in last_prices.items():
             product_id, partner_id = key
@@ -219,7 +214,7 @@ class PurchaseOrderInherit(models.Model):
         """
         if self.partner_id and self.order_line:
             for line in self.order_line:
-                line._product_id_change()
+                line.onchange_product_id()
 
 
 class PurchaseOrderLineInherit(models.Model):
@@ -229,33 +224,43 @@ class PurchaseOrderLineInherit(models.Model):
     discount = fields.Float(string="Discount (%)", default=0.0)
     fixed_discount = fields.Float(string="Fixed Discount", default=0.0)
 
-    def _product_id_change(self):
+    def _apply_last_price_logic(self, res):
+        """Helper to apply last price logic to onchanges."""
+        if self.product_id:
+            # Ambil dari harga_terakhir atau standard_price (modal)
+            final_price = self.product_id.harga_terakhir or self.product_id.standard_price
+            
+            self.price_unit = final_price
+            
+            # Update the returned dict to prevent client-side overwrite
+            if isinstance(res, dict) and 'value' in res:
+                res['value']['price_unit'] = final_price
+        
+        return res
+
+    @api.onchange('product_id')
+    def onchange_product_id(self):
+        res = {}
+        if hasattr(super(PurchaseOrderLineInherit, self), 'onchange_product_id'):
+            res = super(PurchaseOrderLineInherit, self).onchange_product_id()
+            
         if not self.product_id:
-            return
+            return res
 
         if self.product_id.multi_uom_enabled:
             self.product_uom_category_id = self.product_id.multi_uom_category_id
         else:
             self.product_uom_category_id = self.product_id.uom_id.category_id
             self.product_uom = self.product_id.uom_po_id or self.product_id.uom_id
-        product_lang = self.product_id.with_context(
-            lang=get_lang(self.env, self.partner_id.lang).code,
-            partner_id=self.partner_id.id,
-            company_id=self.company_id.id,
-        )
-        self.name = self._get_product_purchase_description(product_lang)
+        
+        return self._apply_last_price_logic(res)
 
-        self._compute_tax_id()
-
-        # Fetch last purchase price for the chosen product and vendor
-        if self.product_id and self.order_id.partner_id:
-            last_price_record = self.env['product.last.price.vendor'].search([
-                ('product_id', '=', self.product_id.id),
-                ('partner_id', '=', self.order_id.partner_id.id)
-            ], limit=1)
-
-            if last_price_record:
-                self.price_unit = last_price_record.last_price
+    @api.onchange('product_uom')
+    def onchange_product_uom(self):
+        res = {}
+        if hasattr(super(PurchaseOrderLineInherit, self), 'onchange_product_uom'):
+            res = super(PurchaseOrderLineInherit, self).onchange_product_uom()
+        return self._apply_last_price_logic(res)
 
     @api.depends("product_qty", "price_unit", "taxes_id", "discount", "fixed_discount")
     def _compute_amount(self):
@@ -288,42 +293,3 @@ class PurchaseOrderLineInherit(models.Model):
                 }
             )
 
-    def _update_last_price_for_vendor(self):
-        """
-        Helper method to update or create the last price record
-        for the current purchase order line's product and vendor.
-        """
-        if self.product_id and self.order_id.partner_id and self.price_unit > 0:
-            last_price_record = self.env['product.last.price.vendor'].search([
-                ('product_id', '=', self.product_id.id),
-                ('partner_id', '=', self.order_id.partner_id.id)
-            ], limit=1)
-
-            if last_price_record:
-                last_price_record.write({'last_price': self.price_unit})
-            else:
-                self.env['product.last.price.vendor'].create({
-                    'product_id': self.product_id.id,
-                    'partner_id': self.order_id.partner_id.id,
-                    'last_price': self.price_unit,
-                })
-
-    @api.model_create_multi
-    def create(self, vals_list):
-        """
-        Overrides create to update the last price per vendor after creation.
-        """
-        records = super(PurchaseOrderLineInherit, self).create(vals_list)
-        for record in records:
-            record._update_last_price_for_vendor()
-        return records
-
-    def write(self, vals):
-        """
-        Overrides write to update the last price per vendor after modification.
-        """
-        res = super(PurchaseOrderLineInherit, self).write(vals)
-        for record in self:
-            if 'price_unit' in vals:
-                record._update_last_price_for_vendor()
-        return res
